@@ -1,0 +1,62 @@
+[features]
+seeds = false
+[programs.localnet]
+breed_program = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+
+[registry]
+url = "https://anchor.projectserum.com"
+
+[provider]
+cluster = "localnet"
+wallet = "~/.config/solana/anchor.json"
+
+[scripts]
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
+
+[test]
+startup_wait = 15000
+
+[test.validator]
+url = "https://api.devnet.solana.com"
+
+# Authority
+[[test.validator.clone]]
+address = "7CY9dKWDQimK43RkGXyT7BUpgvUGduSbCRt4RNpv2L8w"
+# Child mint
+[[test.validator.clone]]
+address = "6B6T2eUzArgswFFQmd63nZuTScW9Xjsjh2KPtXNXQ3Pp"
+# Child vault
+[[test.validator.clone]]
+address = "MeFk4Z2NKpdwAAd68A5z7Qx4dMDGyFB9ZvvKVMhCw42"
+
+# User address
+[[test.validator.clone]]
+address = "9BeNtJPhQfV7iRGvgNGMC7Q8hBaiESE5YKQaHQTeiWRr"
+# Mint A
+[[test.validator.clone]]
+address = "4kZVPqN3b2CFUniF8bBdex32ziQ3FxbxhNYT3teV7Jkx"
+# User Mint A ATA
+[[test.validator.clone]]
+address = "Dip3H8tgZGnHqPSkMXiWrX2i64ZQRed63CaBo3FBKF4M"
+# Mint B
+[[test.validator.clone]]
+address = "2Z8esbcvecdEDXp6Py3HW3th9CAUJtTW5Df3Lz1m6qJC"
+# User Mint B ATA
+[[test.validator.clone]]
+address = "CdpebUieyDUgU6AEyk3dpzN7GGPdueoNMR6nYa5Eqtaf"
+# Fee token address
+[[test.validator.clone]]
+address = "NEpinL3xGXUpDeLdiJmVAoMGHXVF6BjsPHV6HRtNZDh"
+# User fee token ATA
+[[test.validator.clone]]
+address = "5qqv2Zs8AjEesRTwV8E2oMsoMjzkCEFu8mr9nN2dCZ6m"
+
+# Token program
+[[test.validator.clone]]
+address = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+# Associated token program
+[[test.validator.clone]]
+address = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+# Token metadata program
+[[test.validator.clone]]
+address = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
