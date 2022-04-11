@@ -196,6 +196,11 @@ describe("breed-program", () => {
     const breedMintBBalance =
       await program.provider.connection.getTokenAccountBalance(breedMintB);
 
+    const breedMachineAccount = await program.account.breedMachine.fetch(
+      breedMachine
+    );
+
+    expect(breedMachineAccount.bred.toNumber()).to.equal(2);
     expect(userMintABalance.value.uiAmount).to.equal(0);
     expect(userMintBBalance.value.uiAmount).to.equal(0);
     expect(breedMintABalance.value.uiAmount).to.equal(1);
@@ -282,6 +287,11 @@ describe("breed-program", () => {
       breedAccount
     );
 
+    const breedMachineAccount = await program.account.breedMachine.fetch(
+      breedMachine
+    );
+
+    expect(breedMachineAccount.born.toNumber()).to.equal(1);
     expect(oldBreedAccount).to.be.null;
     expect(userMintABalance.value.uiAmount).to.equal(1);
     expect(userMintBBalance.value.uiAmount).to.equal(1);
