@@ -9,7 +9,6 @@ use instructions::*;
 
 #[program]
 pub mod breed_program {
-    use std::ops::AddAssign;
 
     use super::*;
 
@@ -37,7 +36,13 @@ pub mod breed_program {
 
         ctx.accounts.breed_data.set_inner(breed_account);
         ctx.accounts.lock_parents()?;
-        ctx.accounts.breeding_machine.bred += 2;
+
+        ctx.accounts.breeding_machine.bred = ctx
+            .accounts
+            .breeding_machine
+            .bred
+            .checked_add(2)
+            .ok_or(BreedingError::ArithmeticError)?;
 
         msg!("BreedingProgram: Breeding initialized.");
         msg!("BreedingProgram: Parents locked.");
@@ -49,8 +54,14 @@ pub mod breed_program {
         let bump = *ctx.bumps.get("breed_data").unwrap();
 
         // Increment born counter
-        // TODO: check integer overflow
-        ctx.accounts.breeding_machine.born.add_assign(1);
+        ctx.accounts.breeding_machine.born = ctx
+            .accounts
+            .breeding_machine
+            .born
+            .checked_add(1)
+            .ok_or(BreedingError::ArithmeticError)?;
+
+        // TODO: verify timestamp
 
         // Unlock parents (burn or transfer back)
         ctx.accounts.unlock_parents(&[&[
@@ -134,4 +145,10 @@ impl BreedData {
             mint_b,
         })
     }
+}
+
+#[error_code]
+pub enum BreedingError {
+    #[msg("Arithmetic error occurred.")]
+    ArithmeticError,
 }
