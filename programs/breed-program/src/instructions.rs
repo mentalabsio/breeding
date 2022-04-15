@@ -17,7 +17,6 @@ pub struct InitializeBreedMachine<'info> {
             BreedMachine::PREFIX,
             config.parents_candy_machine.as_ref(),
             config.children_candy_machine.as_ref(),
-            authority.key().as_ref()
         ],
         bump
     )]
