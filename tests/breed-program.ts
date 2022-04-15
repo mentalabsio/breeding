@@ -21,11 +21,10 @@ const findBreedMachineAddress = (
     breedingProgram
   )[0];
 
-const findBreedAccountAddress = (
+const findBreedDataAddress = (
   breedMachineAddress: anchor.web3.PublicKey,
   mintAddressA: anchor.web3.PublicKey,
   mintAddressB: anchor.web3.PublicKey,
-  authority: anchor.web3.PublicKey,
   breedingProgram: anchor.web3.PublicKey
 ) =>
   anchor.utils.publicKey.findProgramAddressSync(
@@ -34,7 +33,6 @@ const findBreedAccountAddress = (
       breedMachineAddress.toBuffer(),
       mintAddressA.toBuffer(),
       mintAddressB.toBuffer(),
-      authority.toBuffer(),
     ],
     breedingProgram
   )[0];
@@ -65,20 +63,17 @@ describe("breed-program", () => {
     )
   );
 
-  const mintAccountA = new anchor.web3.PublicKey(
+  const mintParentA = new anchor.web3.PublicKey(
     "4kZVPqN3b2CFUniF8bBdex32ziQ3FxbxhNYT3teV7Jkx"
   );
-  const mintAccountB = new anchor.web3.PublicKey(
+  const mintParentB = new anchor.web3.PublicKey(
     "2Z8esbcvecdEDXp6Py3HW3th9CAUJtTW5Df3Lz1m6qJC"
-  );
-  const childMint = new anchor.web3.PublicKey(
-    "6B6T2eUzArgswFFQmd63nZuTScW9Xjsjh2KPtXNXQ3Pp"
   );
   const feeToken = new anchor.web3.PublicKey(
     "NEpinL3xGXUpDeLdiJmVAoMGHXVF6BjsPHV6HRtNZDh"
   );
 
-  const breedMachine = findBreedMachineAddress(
+  const breedingMachine = findBreedMachineAddress(
     candyMachineAddress,
     candyMachineAddress,
     authority.publicKey,
@@ -96,7 +91,7 @@ describe("breed-program", () => {
     const tx = await program.methods
       .createMachine(config)
       .accounts({
-        breedMachine,
+        breedingMachine,
         authority: authority.publicKey,
       })
       .signers([authority])
@@ -105,7 +100,7 @@ describe("breed-program", () => {
     console.log("Your transaction signature", tx);
 
     const machineAccount = await program.account.breedMachine.fetch(
-      breedMachine
+      breedingMachine
     );
 
     expect(machineAccount.born.toNumber()).to.equal(0);
@@ -113,32 +108,31 @@ describe("breed-program", () => {
   });
 
   it("should be able to initialize a breeding", async () => {
-    const breedAccount = findBreedAccountAddress(
-      breedMachine,
-      mintAccountA,
-      mintAccountB,
-      authority.publicKey,
+    const breedData = findBreedDataAddress(
+      breedingMachine,
+      mintParentA,
+      mintParentB,
       program.programId
     );
 
-    const userMintA = await anchor.utils.token.associatedAddress({
-      mint: mintAccountA,
+    const userAtaParentA = await anchor.utils.token.associatedAddress({
+      mint: mintParentA,
       owner: userWallet.publicKey,
     });
 
-    const userMintB = await anchor.utils.token.associatedAddress({
-      mint: mintAccountB,
+    const userAtaParentB = await anchor.utils.token.associatedAddress({
+      mint: mintParentB,
       owner: userWallet.publicKey,
     });
 
-    const breedMintA = await anchor.utils.token.associatedAddress({
-      mint: mintAccountA,
-      owner: breedAccount,
+    const vaultAtaParentA = await anchor.utils.token.associatedAddress({
+      mint: mintParentA,
+      owner: breedData,
     });
 
-    const breedMintB = await anchor.utils.token.associatedAddress({
-      mint: mintAccountB,
-      owner: breedAccount,
+    const vaultAtaParentB = await anchor.utils.token.associatedAddress({
+      mint: mintParentB,
+      owner: breedData,
     });
 
     const feePayerAta = await anchor.utils.token.associatedAddress({
@@ -161,43 +155,42 @@ describe("breed-program", () => {
     const tx = await program.methods
       .initializeBreeding(feePrice)
       .accounts({
-        breedMachine,
-        breedAccount,
+        breedingMachine,
+        breedData,
 
-        mintAccountA,
-        userMintA,
-        breedMintA,
+        mintParentA,
+        userAtaParentA,
+        vaultAtaParentA,
 
-        mintAccountB,
-        userMintB,
-        breedMintB,
+        mintParentB,
+        userAtaParentB,
+        vaultAtaParentB,
 
         feeToken,
         feePayerAta,
         feeIncineratorAta,
 
         userWallet: userWallet.publicKey,
-        authority: authority.publicKey,
       })
-      .signers([authority, userWallet])
+      .signers([userWallet])
       .rpc();
 
     console.log("Your transaction signature", tx);
 
     const userMintABalance =
-      await program.provider.connection.getTokenAccountBalance(userMintA);
+      await program.provider.connection.getTokenAccountBalance(userAtaParentA);
 
     const userMintBBalance =
-      await program.provider.connection.getTokenAccountBalance(userMintA);
+      await program.provider.connection.getTokenAccountBalance(userAtaParentB);
 
     const breedMintABalance =
-      await program.provider.connection.getTokenAccountBalance(breedMintA);
+      await program.provider.connection.getTokenAccountBalance(vaultAtaParentA);
 
     const breedMintBBalance =
-      await program.provider.connection.getTokenAccountBalance(breedMintB);
+      await program.provider.connection.getTokenAccountBalance(vaultAtaParentB);
 
     const breedMachineAccount = await program.account.breedMachine.fetch(
-      breedMachine
+      breedingMachine
     );
 
     expect(breedMachineAccount.bred.toNumber()).to.equal(2);
@@ -208,94 +201,72 @@ describe("breed-program", () => {
   });
 
   it("should be able to terminate a breeding", async () => {
-    const breedAccount = findBreedAccountAddress(
-      breedMachine,
-      mintAccountA,
-      mintAccountB,
-      authority.publicKey,
+    const breedData = findBreedDataAddress(
+      breedingMachine,
+      mintParentA,
+      mintParentB,
       program.programId
     );
 
-    const userMintA = await anchor.utils.token.associatedAddress({
-      mint: mintAccountA,
+    const userAtaParentA = await anchor.utils.token.associatedAddress({
+      mint: mintParentA,
       owner: userWallet.publicKey,
     });
 
-    const userMintB = await anchor.utils.token.associatedAddress({
-      mint: mintAccountB,
+    const userAtaParentB = await anchor.utils.token.associatedAddress({
+      mint: mintParentB,
       owner: userWallet.publicKey,
     });
 
-    const breedMintA = await anchor.utils.token.associatedAddress({
-      mint: mintAccountA,
-      owner: breedAccount,
+    const vaultAtaParentA = await anchor.utils.token.associatedAddress({
+      mint: mintParentA,
+      owner: breedData,
     });
 
-    const breedMintB = await anchor.utils.token.associatedAddress({
-      mint: mintAccountB,
-      owner: breedAccount,
-    });
-
-    const childVault = await anchor.utils.token.associatedAddress({
-      mint: childMint,
-      owner: authority.publicKey,
-    });
-
-    const userChildAta = await anchor.utils.token.associatedAddress({
-      mint: childMint,
-      owner: userWallet.publicKey,
+    const vaultAtaParentB = await anchor.utils.token.associatedAddress({
+      mint: mintParentB,
+      owner: breedData,
     });
 
     const tx = await program.methods
       .finalizeBreeding()
       .accounts({
-        breedMachine,
-        breedAccount,
+        breedingMachine,
+        breedData,
 
-        mintAccountA,
-        userMintA,
-        breedMintA,
+        mintParentA,
+        mintParentB,
 
-        mintAccountB,
-        userMintB,
-        breedMintB,
+        userAtaParentA,
+        userAtaParentB,
 
-        childMint,
-        childVault,
-        userChildAta,
+        vaultAtaParentA,
+        vaultAtaParentB,
+
         userWallet: userWallet.publicKey,
-        authority: authority.publicKey,
       })
-      .signers([authority, userWallet])
+      .signers([userWallet])
       .rpc();
 
     console.log("Your transaction signature", tx);
 
     const userMintABalance =
-      await program.provider.connection.getTokenAccountBalance(userMintA);
+      await program.provider.connection.getTokenAccountBalance(userAtaParentA);
 
     const userMintBBalance =
-      await program.provider.connection.getTokenAccountBalance(userMintA);
+      await program.provider.connection.getTokenAccountBalance(userAtaParentB);
 
-    const userChildAtaBalance =
-      await program.provider.connection.getTokenAccountBalance(userChildAta);
-
-    const childVaultBalance =
-      await program.provider.connection.getTokenAccountBalance(childVault);
-
-    const oldBreedAccount = await program.account.breedAccount.fetchNullable(
-      breedAccount
+    const oldBreedAccount = await program.account.breedData.fetchNullable(
+      breedData
     );
 
     const breedMachineAccount = await program.account.breedMachine.fetch(
-      breedMachine
+      breedingMachine
     );
 
     expect(breedMachineAccount.born.toNumber()).to.equal(1);
     expect(oldBreedAccount).to.be.null;
     expect(userMintABalance.value.uiAmount).to.equal(1);
     expect(userMintBBalance.value.uiAmount).to.equal(1);
-    expect(userChildAtaBalance.value.uiAmount).to.equal(1);
-    expect(childVaultBalance.value.uiAmount).to.equal(0);
   });
 });

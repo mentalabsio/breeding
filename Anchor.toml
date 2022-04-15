@@ -22,12 +22,6 @@ url = "https://api.devnet.solana.com"
 # Authority
 [[test.validator.clone]]
 address = "7CY9dKWDQimK43RkGXyT7BUpgvUGduSbCRt4RNpv2L8w"
-# Child mint
-[[test.validator.clone]]
-address = "6B6T2eUzArgswFFQmd63nZuTScW9Xjsjh2KPtXNXQ3Pp"
-# Child vault
-[[test.validator.clone]]
-address = "MeFk4Z2NKpdwAAd68A5z7Qx4dMDGyFB9ZvvKVMhCw42"
 
 # User address
 [[test.validator.clone]]

@@ -9,24 +9,33 @@ use instructions::*;
 
 #[program]
 pub mod breed_program {
+    use std::ops::AddAssign;
+
     use super::*;
 
     pub fn create_machine(ctx: Context<InitializeBreedMachine>, config: BreedConfig) -> Result<()> {
         let machine = BreedMachine::new(ctx.accounts.authority.key(), config);
-        ctx.accounts.breed_machine.set_inner(machine);
+        ctx.accounts.breeding_machine.set_inner(machine);
         Ok(())
     }
 
     #[access_control(charge::token_fee(&ctx, fee))]
     #[access_control(InitializeBreed::validate_nfts(&ctx))]
     pub fn initialize_breeding(ctx: Context<InitializeBreed>, fee: u64) -> Result<()> {
-        let authority = ctx.accounts.authority.key();
         let owner = ctx.accounts.user_wallet.key();
-        let breed_account = BreedAccount::new(authority, owner)?;
+        let mint_parent_a = ctx.accounts.mint_parent_a.key();
+        let mint_parent_b = ctx.accounts.mint_parent_b.key();
 
-        ctx.accounts.breed_account.set_inner(breed_account);
+        let breed_account = BreedData::new(
+            ctx.accounts.breeding_machine.authority,
+            owner,
+            mint_parent_a,
+            mint_parent_b,
+        )?;
+
+        ctx.accounts.breed_data.set_inner(breed_account);
         ctx.accounts.lock_parents()?;
-        ctx.accounts.breed_machine.bred += 2;
+        ctx.accounts.breeding_machine.bred += 2;
 
         msg!("BreedingProgram: Breeding initialized.");
         msg!("BreedingProgram: Parents locked.");
@@ -35,19 +44,20 @@ pub mod breed_program {
     }
 
     pub fn finalize_breeding(ctx: Context<FinalizeBreeding>) -> Result<()> {
-        let bump = *ctx.bumps.get("breed_account").unwrap();
+        let bump = *ctx.bumps.get("breed_data").unwrap();
+
         // Increment born counter
-        ctx.accounts.breed_machine.born += 1;
+        // TODO: check integer overflow
+        ctx.accounts.breeding_machine.born.add_assign(1);
+
         // Unlock parents (burn or transfer back)
         ctx.accounts.unlock_parents(&[&[
-            BreedAccount::PREFIX,
-            ctx.accounts.breed_machine.key().as_ref(),
-            ctx.accounts.mint_account_a.key().as_ref(),
-            ctx.accounts.mint_account_b.key().as_ref(),
-            ctx.accounts.authority.key().as_ref(),
+            BreedData::PREFIX,
+            ctx.accounts.breeding_machine.key().as_ref(),
+            ctx.accounts.mint_parent_a.key().as_ref(),
+            ctx.accounts.mint_parent_b.key().as_ref(),
             &[bump], // must come last
         ]])?;
-        ctx.accounts.send_newborn()?;
         Ok(())
     }
 }
@@ -105,22 +115,26 @@ impl BreedConfig {
 /// This account will manage a user's breeding progress, locking the NFTs in the meantime.
 /// The NFTs would only be burned once the breeding is complete.
 #[account]
-pub struct BreedAccount {
+pub struct BreedData {
     pub owner: Pubkey,
     pub authority: Pubkey,
     pub timestamp: i64,
+    pub mint_a: Pubkey,
+    pub mint_b: Pubkey,
 }
 
-impl BreedAccount {
+impl BreedData {
     // Account discriminator byte not considered.
-    pub const LEN: usize = 8 + 32 + 32;
+    pub const LEN: usize = 8 + 32 + 32 + 32 + 32;
     pub const PREFIX: &'static [u8] = b"breed_account";
 
-    pub fn new(authority: Pubkey, owner: Pubkey) -> Result<Self> {
+    pub fn new(authority: Pubkey, owner: Pubkey, mint_a: Pubkey, mint_b: Pubkey) -> Result<Self> {
         Ok(Self {
             authority,
             owner,
             timestamp: Clock::get()?.unix_timestamp,
+            mint_a,
+            mint_b,
         })
     }
 }

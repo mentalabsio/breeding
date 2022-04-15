@@ -1,4 +1,4 @@
-use crate::{BreedAccount, BreedConfig, BreedMachine};
+use crate::{BreedConfig, BreedData, BreedMachine};
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
@@ -21,7 +21,7 @@ pub struct InitializeBreedMachine<'info> {
         ],
         bump
     )]
-    pub breed_machine: Account<'info, BreedMachine>,
+    pub breeding_machine: Account<'info, BreedMachine>,
     #[account(mut)]
     pub authority: Signer<'info>,
     pub system_program: Program<'info, System>,
@@ -29,57 +29,54 @@ pub struct InitializeBreedMachine<'info> {
 
 #[derive(Accounts, Chargeable)]
 pub struct InitializeBreed<'info> {
-    #[account(mut, has_one = authority)]
-    pub breed_machine: Account<'info, BreedMachine>,
+    #[account(mut)]
+    pub breeding_machine: Account<'info, BreedMachine>,
     #[account(
         init,
         payer = user_wallet,
-        space = 8 + BreedAccount::LEN,
+        space = 8 + BreedData::LEN,
         seeds = [
-            BreedAccount::PREFIX,
-            breed_machine.key().as_ref(),
-            mint_account_a.key().as_ref(),
-            mint_account_b.key().as_ref(),
-            authority.key().as_ref(),
+            BreedData::PREFIX,
+            breeding_machine.key().as_ref(),
+            mint_parent_a.key().as_ref(),
+            mint_parent_b.key().as_ref(),
         ],
         bump
     )]
-    pub breed_account: Account<'info, BreedAccount>,
+    pub breed_data: Account<'info, BreedData>,
 
-    // Parent NFT #1
-    pub mint_account_a: Account<'info, Mint>,
-    // Parent NFT #2
-    pub mint_account_b: Account<'info, Mint>,
+    pub mint_parent_a: Account<'info, Mint>,
+    pub mint_parent_b: Account<'info, Mint>,
 
     #[account(
         mut,
-        associated_token::mint = mint_account_a,
+        associated_token::mint = mint_parent_a,
         associated_token::authority = user_wallet
     )]
-    pub user_mint_a: Box<Account<'info, TokenAccount>>,
+    pub user_ata_parent_a: Box<Account<'info, TokenAccount>>,
 
     #[account(
         mut,
-        associated_token::mint = mint_account_b,
+        associated_token::mint = mint_parent_b,
         associated_token::authority = user_wallet
     )]
-    pub user_mint_b: Box<Account<'info, TokenAccount>>,
+    pub user_ata_parent_b: Box<Account<'info, TokenAccount>>,
 
     #[account(
         init,
         payer = user_wallet,
-        associated_token::mint = mint_account_a,
-        associated_token::authority = breed_account
+        associated_token::mint = mint_parent_a,
+        associated_token::authority = breed_data
     )]
-    pub breed_mint_a: Box<Account<'info, TokenAccount>>,
+    pub vault_ata_parent_a: Box<Account<'info, TokenAccount>>,
 
     #[account(
         init,
         payer = user_wallet,
-        associated_token::mint = mint_account_b,
-        associated_token::authority = breed_account
+        associated_token::mint = mint_parent_b,
+        associated_token::authority = breed_data
     )]
-    pub breed_mint_b: Box<Account<'info, TokenAccount>>,
+    pub vault_ata_parent_b: Box<Account<'info, TokenAccount>>,
 
     pub fee_token: Box<Account<'info, Mint>>,
     #[account(
@@ -95,8 +92,6 @@ pub struct InitializeBreed<'info> {
     #[account(mut)]
     #[fee_payer]
     pub user_wallet: Signer<'info>,
-
-    pub authority: Signer<'info>,
     pub rent: Sysvar<'info, Rent>,
     pub token_program: Program<'info, Token>,
     pub associated_token_program: Program<'info, AssociatedToken>,
@@ -112,8 +107,8 @@ impl<'info> InitializeBreed<'info> {
     pub fn lock_parents(&self) -> Result<()> {
         // Lock NFT #1
         let accounts = Transfer {
-            from: self.user_mint_a.to_account_info(),
-            to: self.breed_mint_a.to_account_info(),
+            from: self.user_ata_parent_a.to_account_info(),
+            to: self.vault_ata_parent_a.to_account_info(),
             authority: self.user_wallet.to_account_info(),
         };
         let cpi = CpiContext::new(self.token_program.to_account_info(), accounts);
@@ -121,8 +116,8 @@ impl<'info> InitializeBreed<'info> {
 
         // Lock NFT #2
         let accounts = Transfer {
-            from: self.user_mint_b.to_account_info(),
-            to: self.breed_mint_b.to_account_info(),
+            from: self.user_ata_parent_b.to_account_info(),
+            to: self.vault_ata_parent_b.to_account_info(),
             authority: self.user_wallet.to_account_info(),
         };
         let cpi = CpiContext::new(self.token_program.to_account_info(), accounts);
@@ -132,72 +127,56 @@ impl<'info> InitializeBreed<'info> {
 
 #[derive(Accounts)]
 pub struct FinalizeBreeding<'info> {
-    #[account(mut, has_one = authority)]
-    pub breed_machine: Account<'info, BreedMachine>,
-
-    // Parent NFT #1
-    pub mint_account_a: Account<'info, Mint>,
-    // Parent NFT #2
-    pub mint_account_b: Account<'info, Mint>,
-    #[account(
-        mut,
-        associated_token::mint = mint_account_a,
-        associated_token::authority = user_wallet
-    )]
-    pub user_mint_a: Box<Account<'info, TokenAccount>>,
-    #[account(
-        mut,
-        associated_token::mint = mint_account_b,
-        associated_token::authority = user_wallet
-    )]
-    pub user_mint_b: Box<Account<'info, TokenAccount>>,
-
-    #[account(
-        mut,
-        associated_token::mint = mint_account_a,
-        associated_token::authority = breed_account
-    )]
-    pub breed_mint_a: Box<Account<'info, TokenAccount>>,
-    #[account(
-        mut,
-        associated_token::mint = mint_account_b,
-        associated_token::authority = breed_account
-    )]
-    pub breed_mint_b: Box<Account<'info, TokenAccount>>,
-
-    pub child_mint: Box<Account<'info, Mint>>,
-    #[account(
-        mut,
-        associated_token::mint = child_mint,
-        associated_token::authority = authority
-    )]
-    pub child_vault: Box<Account<'info, TokenAccount>>,
-    #[account(
-        init,
-        payer = user_wallet,
-        associated_token::mint = child_mint,
-        associated_token::authority = user_wallet
-    )]
-    pub user_child_ata: Box<Account<'info, TokenAccount>>,
+    #[account(mut)]
+    pub breeding_machine: Account<'info, BreedMachine>,
 
     #[account(
         mut,
         close = user_wallet,
         seeds = [
-            BreedAccount::PREFIX,
-            breed_machine.key().as_ref(),
-            mint_account_a.key().as_ref(),
-            mint_account_b.key().as_ref(),
-            authority.key().as_ref(),
+            BreedData::PREFIX,
+            breeding_machine.key().as_ref(),
+            mint_parent_a.key().as_ref(),
+            mint_parent_b.key().as_ref(),
         ],
         bump
     )]
-    pub breed_account: Account<'info, BreedAccount>,
+    pub breed_data: Account<'info, BreedData>,
+
+    #[account(address = breed_data.mint_a)]
+    pub mint_parent_a: Account<'info, Mint>,
+
+    #[account(address = breed_data.mint_b)]
+    pub mint_parent_b: Account<'info, Mint>,
+
+    #[account(
+        mut,
+        associated_token::mint = mint_parent_a,
+        associated_token::authority = user_wallet
+    )]
+    pub user_ata_parent_a: Box<Account<'info, TokenAccount>>,
+    #[account(
+        mut,
+        associated_token::mint = mint_parent_b,
+        associated_token::authority = user_wallet
+    )]
+    pub user_ata_parent_b: Box<Account<'info, TokenAccount>>,
+
+    #[account(
+        mut,
+        associated_token::mint = mint_parent_a,
+        associated_token::authority = breed_data
+    )]
+    pub vault_ata_parent_a: Box<Account<'info, TokenAccount>>,
+    #[account(
+        mut,
+        associated_token::mint = mint_parent_b,
+        associated_token::authority = breed_data
+    )]
+    pub vault_ata_parent_b: Box<Account<'info, TokenAccount>>,
 
     #[account(mut)]
     pub user_wallet: Signer<'info>,
-    #[account(mut)]
-    pub authority: Signer<'info>,
 
     pub rent: Sysvar<'info, Rent>,
     pub token_program: Program<'info, Token>,
@@ -208,17 +187,17 @@ pub struct FinalizeBreeding<'info> {
 impl<'info> FinalizeBreeding<'info> {
     fn transfer_back(&self, signer_seeds: &[&[&[u8]]]) -> Result<()> {
         let accounts = Transfer {
-            from: self.breed_mint_a.to_account_info(),
-            to: self.user_mint_a.to_account_info(),
-            authority: self.breed_account.to_account_info(),
+            from: self.vault_ata_parent_a.to_account_info(),
+            to: self.user_ata_parent_a.to_account_info(),
+            authority: self.breed_data.to_account_info(),
         };
         let cpi = CpiContext::new(self.token_program.to_account_info(), accounts);
         anchor_spl::token::transfer(cpi.with_signer(signer_seeds), 1)?;
 
         let accounts = Transfer {
-            from: self.breed_mint_b.to_account_info(),
-            to: self.user_mint_b.to_account_info(),
-            authority: self.breed_account.to_account_info(),
+            from: self.vault_ata_parent_b.to_account_info(),
+            to: self.user_ata_parent_b.to_account_info(),
+            authority: self.breed_data.to_account_info(),
         };
         let cpi = CpiContext::new(self.token_program.to_account_info(), accounts);
         anchor_spl::token::transfer(cpi.with_signer(signer_seeds), 1)?;
@@ -228,17 +207,17 @@ impl<'info> FinalizeBreeding<'info> {
 
     fn burn(&self, signer_seeds: &[&[&[u8]]]) -> Result<()> {
         let accounts = Burn {
-            to: self.breed_mint_a.to_account_info(),
-            mint: self.mint_account_a.to_account_info(),
-            authority: self.breed_account.to_account_info(),
+            from: self.vault_ata_parent_a.to_account_info(),
+            mint: self.mint_parent_a.to_account_info(),
+            authority: self.breed_data.to_account_info(),
         };
         let cpi = CpiContext::new(self.token_program.to_account_info(), accounts);
         anchor_spl::token::burn(cpi.with_signer(signer_seeds), 1)?;
 
         let accounts = Burn {
-            to: self.breed_mint_b.to_account_info(),
-            mint: self.mint_account_b.to_account_info(),
-            authority: self.breed_account.to_account_info(),
+            from: self.vault_ata_parent_b.to_account_info(),
+            mint: self.mint_parent_b.to_account_info(),
+            authority: self.breed_data.to_account_info(),
         };
         let cpi = CpiContext::new(self.token_program.to_account_info(), accounts);
         anchor_spl::token::burn(cpi.with_signer(signer_seeds), 1)?;
@@ -248,17 +227,17 @@ impl<'info> FinalizeBreeding<'info> {
 
     fn close_parent_vaults(&self, signer_seeds: &[&[&[u8]]]) -> Result<()> {
         let accounts = CloseAccount {
-            account: self.breed_mint_a.to_account_info(),
-            destination: self.breed_account.to_account_info(),
-            authority: self.breed_account.to_account_info(),
+            account: self.vault_ata_parent_a.to_account_info(),
+            destination: self.breed_data.to_account_info(),
+            authority: self.breed_data.to_account_info(),
         };
         let cpi = CpiContext::new(self.token_program.to_account_info(), accounts);
         anchor_spl::token::close_account(cpi.with_signer(signer_seeds))?;
 
         let accounts = CloseAccount {
-            account: self.breed_mint_b.to_account_info(),
-            destination: self.breed_account.to_account_info(),
-            authority: self.breed_account.to_account_info(),
+            account: self.vault_ata_parent_b.to_account_info(),
+            destination: self.breed_data.to_account_info(),
+            authority: self.breed_data.to_account_info(),
         };
         let cpi = CpiContext::new(self.token_program.to_account_info(), accounts);
         anchor_spl::token::close_account(cpi.with_signer(signer_seeds))?;
@@ -267,25 +246,10 @@ impl<'info> FinalizeBreeding<'info> {
     }
 
     pub fn unlock_parents(&self, signer_seeds: &[&[&[u8]]]) -> Result<()> {
-        match self.breed_machine.config.burn_parents {
+        match self.breeding_machine.config.burn_parents {
             true => self.burn(signer_seeds)?,
             false => self.transfer_back(signer_seeds)?,
         };
         self.close_parent_vaults(signer_seeds)
-    }
-
-    pub fn send_newborn(&self) -> Result<()> {
-        // Send child NFT
-        let accounts = Transfer {
-            from: self.child_vault.to_account_info(),
-            to: self.user_child_ata.to_account_info(),
-            authority: self.authority.to_account_info(),
-        };
-        let cpi = CpiContext::new(self.token_program.to_account_info(), accounts);
-        anchor_spl::token::transfer(cpi, 1)?;
-
-        msg!("BreedingProgram: breeding complete!");
-
-        Ok(())
     }
 }

@@ -16,6 +16,6 @@ cpi = ["no-entrypoint"]
 default = []
 
 [dependencies]
-anchor-lang = "0.22.1"
-anchor-spl = "0.22.1"
+anchor-lang = "0.24.0"
+anchor-spl = "0.24.0"
 solutils = { git = "https://github.com/lucasig11/solutils", branch = "main" }
