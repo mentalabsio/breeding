@@ -1,7 +1,10 @@
 [features]
 seeds = false
+
+[programs.devnet]
+breed_program = "CikztTpnE9wiNzafzTCSzE4tXKFi5iHcGKzBhpNTiP7p"
 [programs.localnet]
-breed_program = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+breed_program = "CikztTpnE9wiNzafzTCSzE4tXKFi5iHcGKzBhpNTiP7p"
 
 [registry]
 url = "https://anchor.projectserum.com"
