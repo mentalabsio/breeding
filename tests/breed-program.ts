@@ -79,10 +79,12 @@ describe("breed-program", () => {
 
   it("should be able to create a new breeding machine", async () => {
     const config = {
-      cooldown: new anchor.BN(0),
+      breedingTime: new anchor.BN(0),
       burnParents: false,
       childrenCandyMachine: candyMachineAddress,
       parentsCandyMachine: candyMachineAddress,
+      initializationFeePrice: new anchor.BN(1),
+      initializationFeeToken: feeToken,
     };
 
     const tx = await program.methods
@@ -147,10 +149,8 @@ describe("breed-program", () => {
       )
     ).address;
 
-    const feePrice = new anchor.BN(1);
-
     const tx = await program.methods
-      .initializeBreeding(feePrice)
+      .initializeBreeding()
       .accounts({
         breedingMachine,
         breedData,
@@ -163,7 +163,6 @@ describe("breed-program", () => {
         userAtaParentB,
         vaultAtaParentB,
 
-        feeToken,
         feePayerAta,
         feeIncineratorAta,
 

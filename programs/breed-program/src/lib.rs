@@ -19,9 +19,11 @@ pub mod breed_program {
         Ok(())
     }
 
-    #[access_control(charge::token_fee(&ctx, fee))]
+    #[access_control(
+        charge::token_fee(&ctx, ctx.accounts.breeding_machine.config.initialization_fee_price)
+    )]
     #[access_control(InitializeBreed::validate_nfts(&ctx))]
-    pub fn initialize_breeding(ctx: Context<InitializeBreed>, fee: u64) -> Result<()> {
+    pub fn initialize_breeding(ctx: Context<InitializeBreed>) -> Result<()> {
         let owner = ctx.accounts.user_wallet.key();
         let mint_parent_a = ctx.accounts.mint_parent_a.key();
         let mint_parent_b = ctx.accounts.mint_parent_b.key();
@@ -90,26 +92,21 @@ impl BreedMachine {
 #[derive(Debug, Clone, AnchorSerialize, AnchorDeserialize)]
 pub struct BreedConfig {
     // How long to be able to unlock the new NFT.
-    pub cooldown: u64,
+    pub breeding_time: u64,
     // Parents should be burned after the breeding?
     pub burn_parents: bool,
     // Candy machine address in parents NFTs
     pub parents_candy_machine: Pubkey,
     // Candy machine address in children NFTs.
     pub children_candy_machine: Pubkey,
+    // Mint address for the token charged on breeding initialization.
+    pub initialization_fee_token: Pubkey,
+    // How much to charge on breeding initialization.
+    pub initialization_fee_price: u64,
 }
 
 impl BreedConfig {
-    pub const LEN: usize = 8 + 1 + 32 + 32;
-
-    pub fn from_args(args: BreedConfig) -> Self {
-        Self {
-            cooldown: args.cooldown,
-            burn_parents: args.burn_parents,
-            parents_candy_machine: args.parents_candy_machine,
-            children_candy_machine: args.children_candy_machine,
-        }
-    }
+    pub const LEN: usize = 8 + 1 + 32 + 8 + 32 + 32;
 }
 
 /// This account will manage a user's breeding progress, locking the NFTs in the meantime.

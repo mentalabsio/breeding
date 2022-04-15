@@ -77,10 +77,9 @@ pub struct InitializeBreed<'info> {
     )]
     pub vault_ata_parent_b: Box<Account<'info, TokenAccount>>,
 
-    pub fee_token: Box<Account<'info, Mint>>,
     #[account(
         mut,
-        associated_token::mint = fee_token,
+        associated_token::mint = breeding_machine.config.initialization_fee_token,
         associated_token::authority = user_wallet
     )]
     pub fee_payer_ata: Box<Account<'info, TokenAccount>>,
