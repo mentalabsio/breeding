@@ -51,7 +51,13 @@ pub mod breed_program {
     }
 
     pub fn finalize_breeding(ctx: Context<FinalizeBreeding>) -> Result<()> {
-        let bump = *ctx.bumps.get("breed_data").unwrap();
+        let breed_start_timestamp = ctx.accounts.breed_data.timestamp as u64;
+        let breeding_time = ctx.accounts.breeding_machine.config.breeding_time;
+        let now_timestamp = Clock::get()?.unix_timestamp as u64;
+
+        if breed_start_timestamp + breeding_time < now_timestamp {
+            return Err(error!(BreedingError::StillInProgress));
+        }
 
         // Increment born counter
         ctx.accounts.breeding_machine.born = ctx
@@ -61,9 +67,9 @@ pub mod breed_program {
             .checked_add(1)
             .ok_or(BreedingError::ArithmeticError)?;
 
-        // TODO: verify timestamp
-
         // Unlock parents (burn or transfer back)
+        let bump = *ctx.bumps.get("breed_data").unwrap();
+
         ctx.accounts.unlock_parents(&[&[
             BreedData::PREFIX,
             ctx.accounts.breeding_machine.key().as_ref(),
@@ -71,8 +77,12 @@ pub mod breed_program {
             ctx.accounts.mint_parent_b.key().as_ref(),
             &[bump], // must come last
         ]])?;
+
         Ok(())
     }
+
+    // TODO: cancel breeding
+    // TODO: close breeding machine
 }
 
 #[account]
@@ -149,6 +159,8 @@ impl BreedData {
 
 #[error_code]
 pub enum BreedingError {
+    #[msg("Breeding is still in progress.")]
+    StillInProgress,
     #[msg("Arithmetic error occurred.")]
     ArithmeticError,
 }
