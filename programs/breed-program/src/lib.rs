@@ -112,14 +112,14 @@ impl BreedMachine {
 
 #[derive(Debug, Clone, AnchorSerialize, AnchorDeserialize)]
 pub struct BreedConfig {
-    // How long to be able to unlock the new NFT.
+    // How long (seconds) to be able to unlock the new NFT.
     pub breeding_time: u64,
     // Parents should be burned after the breeding?
     pub burn_parents: bool,
     // Candy machine address in parents NFTs
     pub parents_candy_machine: Pubkey,
     // Candy machine address in children NFTs.
-    pub children_candy_machine: Pubkey,
+    pub reward_candy_machine: Pubkey,
     // Mint address for the token charged on breeding initialization.
     pub initialization_fee_token: Pubkey,
     // How much to charge on breeding initialization.
@@ -127,7 +127,7 @@ pub struct BreedConfig {
 }
 
 impl BreedConfig {
-    pub const LEN: usize = 8 + 1 + 32 + 8 + 32 + 32;
+    pub const LEN: usize = 8 + 1 + 32 + 32 + 32 + 8;
 }
 
 /// This account will manage a user's breeding progress, locking the NFTs in the meantime.

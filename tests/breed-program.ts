@@ -7,14 +7,14 @@ import { BreedProgram } from "../target/types/breed_program";
 
 const findBreedMachineAddress = (
   parentsCandyMachine: anchor.web3.PublicKey,
-  childrenCandyMachine: anchor.web3.PublicKey,
+  rewardCandyMachine: anchor.web3.PublicKey,
   breedingProgram: anchor.web3.PublicKey
 ) =>
   anchor.utils.publicKey.findProgramAddressSync(
     [
       Buffer.from("breed_machine"),
       parentsCandyMachine.toBuffer(),
-      childrenCandyMachine.toBuffer(),
+      rewardCandyMachine.toBuffer(),
     ],
     breedingProgram
   )[0];
@@ -81,7 +81,7 @@ describe("breed-program", () => {
     const config = {
       breedingTime: new anchor.BN(0),
       burnParents: false,
-      childrenCandyMachine: candyMachineAddress,
+      rewardCandyMachine: candyMachineAddress,
       parentsCandyMachine: candyMachineAddress,
       initializationFeePrice: new anchor.BN(1),
       initializationFeeToken: feeToken,

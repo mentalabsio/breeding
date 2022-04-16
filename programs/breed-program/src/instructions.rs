@@ -16,7 +16,7 @@ pub struct InitializeBreedMachine<'info> {
         seeds = [
             BreedMachine::PREFIX,
             config.parents_candy_machine.as_ref(),
-            config.children_candy_machine.as_ref(),
+            config.reward_candy_machine.as_ref(),
         ],
         bump
     )]
