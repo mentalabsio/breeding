@@ -10,11 +10,37 @@ use instructions::*;
 #[program]
 pub mod breed_program {
 
+    use anchor_spl::token::spl_token::instruction::AuthorityType;
+
     use super::*;
 
     pub fn create_machine(ctx: Context<InitializeBreedMachine>, config: BreedConfig) -> Result<()> {
         let machine = BreedMachine::new(ctx.accounts.authority.key(), config);
         ctx.accounts.breeding_machine.set_inner(machine);
+
+        let bump = *ctx.bumps.get("breeding_machine").unwrap();
+        let auth_seeds = &[
+            BreedMachine::PREFIX,
+            config.parents_candy_machine.as_ref(),
+            config.reward_candy_machine.as_ref(),
+            &[bump],
+        ];
+
+        // Mint the whitelist supply.
+        anchor_spl::token::mint_to(
+            ctx.accounts.mint_to_ctx().with_signer(&[&*auth_seeds]),
+            config.reward_supply,
+        )?;
+
+        // Unset mint authority.
+        anchor_spl::token::set_authority(
+            ctx.accounts
+                .set_authority_ctx()
+                .with_signer(&[&*auth_seeds]),
+            AuthorityType::MintTokens,
+            None,
+        )?;
+
         Ok(())
     }
 
@@ -51,13 +77,40 @@ pub mod breed_program {
     }
 
     pub fn finalize_breeding(ctx: Context<FinalizeBreeding>) -> Result<()> {
+        let now_timestamp = Clock::get()?.unix_timestamp as u64;
         let breed_start_timestamp = ctx.accounts.breed_data.timestamp as u64;
         let breeding_time = ctx.accounts.breeding_machine.config.breeding_time;
-        let now_timestamp = Clock::get()?.unix_timestamp as u64;
 
         if breed_start_timestamp + breeding_time < now_timestamp {
             return Err(error!(BreedingError::StillInProgress));
         }
+
+        // Unlock parents (burn or transfer back)
+        let breed_data_bump = *ctx.bumps.get("breed_data").unwrap();
+
+        ctx.accounts.unlock_parents(&[&[
+            BreedData::PREFIX,
+            ctx.accounts.breeding_machine.key().as_ref(),
+            ctx.accounts.mint_parent_a.key().as_ref(),
+            ctx.accounts.mint_parent_b.key().as_ref(),
+            &[breed_data_bump], // must come last
+        ]])?;
+
+        // Send 1 reward whitelist token to the user.
+        let machine_bump = *ctx.bumps.get("breeding_machine").unwrap();
+        let config = ctx.accounts.breeding_machine.config;
+
+        let machine_seeds = &[
+            BreedMachine::PREFIX,
+            config.parents_candy_machine.as_ref(),
+            config.reward_candy_machine.as_ref(),
+            &[machine_bump],
+        ];
+
+        anchor_spl::token::transfer(
+            ctx.accounts.transfer_ctx().with_signer(&[&*machine_seeds]),
+            1,
+        )?;
 
         // Increment born counter
         ctx.accounts.breeding_machine.born = ctx
@@ -66,17 +119,6 @@ pub mod breed_program {
             .born
             .checked_add(1)
             .ok_or(BreedingError::ArithmeticError)?;
-
-        // Unlock parents (burn or transfer back)
-        let bump = *ctx.bumps.get("breed_data").unwrap();
-
-        ctx.accounts.unlock_parents(&[&[
-            BreedData::PREFIX,
-            ctx.accounts.breeding_machine.key().as_ref(),
-            ctx.accounts.mint_parent_a.key().as_ref(),
-            ctx.accounts.mint_parent_b.key().as_ref(),
-            &[bump], // must come last
-        ]])?;
 
         Ok(())
     }
@@ -110,7 +152,7 @@ impl BreedMachine {
     }
 }
 
-#[derive(Debug, Clone, AnchorSerialize, AnchorDeserialize)]
+#[derive(Debug, Copy, Clone, AnchorSerialize, AnchorDeserialize)]
 pub struct BreedConfig {
     // How long (seconds) to be able to unlock the new NFT.
     pub breeding_time: u64,
@@ -124,10 +166,12 @@ pub struct BreedConfig {
     pub initialization_fee_token: Pubkey,
     // How much to charge on breeding initialization.
     pub initialization_fee_price: u64,
+    // How many NFTs can be minted after the breeding.
+    pub reward_supply: u64,
 }
 
 impl BreedConfig {
-    pub const LEN: usize = 8 + 1 + 32 + 32 + 32 + 8;
+    pub const LEN: usize = 8 + 1 + 32 + 32 + 32 + 8 + 8;
 }
 
 /// This account will manage a user's breeding progress, locking the NFTs in the meantime.

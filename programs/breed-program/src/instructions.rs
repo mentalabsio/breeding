@@ -2,7 +2,7 @@ use crate::{BreedConfig, BreedData, BreedMachine};
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token::{Burn, CloseAccount, Mint, Token, TokenAccount, Transfer},
+    token::{Burn, CloseAccount, Mint, MintTo, SetAuthority, Token, TokenAccount, Transfer},
 };
 use solutils::charge::Chargeable;
 
@@ -21,15 +21,68 @@ pub struct InitializeBreedMachine<'info> {
         bump
     )]
     pub breeding_machine: Account<'info, BreedMachine>,
+
+    #[account(
+        init,
+        payer = authority,
+        mint::decimals = 0_u8,
+        mint::authority = breeding_machine,
+        seeds = [b"whitelist_token", breeding_machine.key().as_ref()],
+        bump,
+    )]
+    pub whitelist_token: Account<'info, Mint>,
+
+    #[account(
+        init,
+        payer = authority,
+        associated_token::mint = whitelist_token,
+        associated_token::authority = breeding_machine,
+    )]
+    pub whitelist_vault: Account<'info, TokenAccount>,
+
     #[account(mut)]
     pub authority: Signer<'info>,
+
+    pub rent: Sysvar<'info, Rent>,
+    pub token_program: Program<'info, Token>,
     pub system_program: Program<'info, System>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
+}
+
+impl<'info> InitializeBreedMachine<'info> {
+    pub fn mint_to_ctx(&self) -> CpiContext<'_, '_, '_, 'info, MintTo<'info>> {
+        let accounts = MintTo {
+            mint: self.whitelist_token.to_account_info(),
+            to: self.whitelist_vault.to_account_info(),
+            authority: self.breeding_machine.to_account_info(),
+        };
+
+        CpiContext::new(self.token_program.to_account_info(), accounts)
+    }
+
+    pub fn set_authority_ctx(&self) -> CpiContext<'_, '_, '_, 'info, SetAuthority<'info>> {
+        let accounts = SetAuthority {
+            account_or_mint: self.whitelist_token.to_account_info(),
+            current_authority: self.breeding_machine.to_account_info(),
+        };
+
+        CpiContext::new(self.token_program.to_account_info(), accounts)
+    }
 }
 
 #[derive(Accounts, Chargeable)]
 pub struct InitializeBreed<'info> {
-    #[account(mut)]
+    #[account(
+        mut,
+        seeds = [
+            BreedMachine::PREFIX,
+            breeding_machine.config.parents_candy_machine.as_ref(),
+            breeding_machine.config.reward_candy_machine.as_ref(),
+        ],
+        bump
+    )]
     pub breeding_machine: Account<'info, BreedMachine>,
+
     #[account(
         init,
         payer = user_wallet,
@@ -125,7 +178,15 @@ impl<'info> InitializeBreed<'info> {
 
 #[derive(Accounts)]
 pub struct FinalizeBreeding<'info> {
-    #[account(mut)]
+    #[account(
+        mut,
+        seeds = [
+            BreedMachine::PREFIX,
+            breeding_machine.config.parents_candy_machine.as_ref(),
+            breeding_machine.config.reward_candy_machine.as_ref(),
+        ],
+        bump
+    )]
     pub breeding_machine: Account<'info, BreedMachine>,
 
     #[account(
@@ -172,6 +233,27 @@ pub struct FinalizeBreeding<'info> {
         associated_token::authority = breed_data
     )]
     pub vault_ata_parent_b: Box<Account<'info, TokenAccount>>,
+
+    #[account(
+        seeds = [b"whitelist_token", breeding_machine.key().as_ref()],
+        bump,
+    )]
+    pub whitelist_token: Box<Account<'info, Mint>>,
+
+    #[account(
+        mut,
+        associated_token::mint = whitelist_token,
+        associated_token::authority = breeding_machine
+    )]
+    pub whitelist_vault: Box<Account<'info, TokenAccount>>,
+
+    #[account(
+        init,
+        payer = user_wallet,
+        associated_token::mint = whitelist_token,
+        associated_token::authority = user_wallet
+    )]
+    pub user_whitelist_ata: Box<Account<'info, TokenAccount>>,
 
     #[account(mut)]
     pub user_wallet: Signer<'info>,
@@ -249,5 +331,15 @@ impl<'info> FinalizeBreeding<'info> {
             false => self.transfer_back(signer_seeds)?,
         };
         self.close_parent_vaults(signer_seeds)
+    }
+
+    pub fn transfer_ctx(&self) -> CpiContext<'_, '_, '_, 'info, Transfer<'info>> {
+        let accounts = Transfer {
+            from: self.whitelist_vault.to_account_info(),
+            to: self.user_whitelist_ata.to_account_info(),
+            authority: self.breeding_machine.to_account_info(),
+        };
+
+        CpiContext::new(self.token_program.to_account_info(), accounts)
     }
 }

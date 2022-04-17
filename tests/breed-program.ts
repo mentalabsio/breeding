@@ -35,6 +35,15 @@ const findBreedDataAddress = (
     breedingProgram
   )[0];
 
+const findWhitelistTokenAddress = (
+  breedingMachine: anchor.web3.PublicKey,
+  breedingProgram: anchor.web3.PublicKey
+) =>
+  anchor.utils.publicKey.findProgramAddressSync(
+    [Buffer.from("whitelist_token"), breedingMachine.toBuffer()],
+    breedingProgram
+  )[0];
+
 describe("breed-program", () => {
   // Configure the client to use the local cluster.
   anchor.setProvider(anchor.Provider.env());
@@ -77,20 +86,33 @@ describe("breed-program", () => {
     program.programId
   );
 
+  const whitelistToken = findWhitelistTokenAddress(
+    breedingMachine,
+    program.programId
+  );
+
   it("should be able to create a new breeding machine", async () => {
     const config = {
-      breedingTime: new anchor.BN(0),
       burnParents: false,
+      breedingTime: new anchor.BN(1),
+      rewardSupply: new anchor.BN(3333),
+      initializationFeeToken: feeToken,
+      initializationFeePrice: new anchor.BN(1),
       rewardCandyMachine: candyMachineAddress,
       parentsCandyMachine: candyMachineAddress,
-      initializationFeePrice: new anchor.BN(1),
-      initializationFeeToken: feeToken,
     };
+
+    const whitelistVault = await anchor.utils.token.associatedAddress({
+      mint: whitelistToken,
+      owner: breedingMachine,
+    });
 
     const tx = await program.methods
       .createMachine(config)
       .accounts({
         breedingMachine,
+        whitelistToken,
+        whitelistVault,
         authority: authority.publicKey,
       })
       .signers([authority])
@@ -102,6 +124,15 @@ describe("breed-program", () => {
       breedingMachine
     );
 
+    const wlTokenSupply = await program.provider.connection.getTokenSupply(
+      whitelistToken
+    );
+
+    const wlVaultBalance =
+      await program.provider.connection.getTokenAccountBalance(whitelistVault);
+
+    expect(wlTokenSupply.value.uiAmount).to.equal(3333);
+    expect(wlVaultBalance.value.uiAmount).to.equal(3333);
     expect(machineAccount.born.toNumber()).to.equal(0);
     expect(machineAccount.bred.toNumber()).to.equal(0);
   });
@@ -224,6 +255,16 @@ describe("breed-program", () => {
       owner: breedData,
     });
 
+    const whitelistVault = await anchor.utils.token.associatedAddress({
+      mint: whitelistToken,
+      owner: breedingMachine,
+    });
+
+    const userWhitelistAta = await anchor.utils.token.associatedAddress({
+      mint: whitelistToken,
+      owner: userWallet.publicKey,
+    });
+
     const tx = await program.methods
       .finalizeBreeding()
       .accounts({
@@ -238,6 +279,10 @@ describe("breed-program", () => {
 
         vaultAtaParentA,
         vaultAtaParentB,
+
+        whitelistToken,
+        whitelistVault,
+        userWhitelistAta,
 
         userWallet: userWallet.publicKey,
       })
@@ -260,8 +305,14 @@ describe("breed-program", () => {
       breedingMachine
     );
 
-    expect(breedMachineAccount.born.toNumber()).to.equal(1);
+    const userWhitelistTokenBalance =
+      await program.provider.connection.getTokenAccountBalance(
+        userWhitelistAta
+      );
+
+    expect(userWhitelistTokenBalance.value.uiAmount).to.equal(1);
     expect(oldBreedAccount).to.be.null;
+    expect(breedMachineAccount.born.toNumber()).to.equal(1);
     expect(userMintABalance.value.uiAmount).to.equal(1);
     expect(userMintBBalance.value.uiAmount).to.equal(1);
   });
