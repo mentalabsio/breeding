@@ -1,5 +1,5 @@
 /** @jsxImportSource theme-ui */
-import { keyframes } from "@emotion/react"
+import { keyframes } from "@emotion/react";
 
 const rotate = keyframes`
   from {
@@ -8,7 +8,7 @@ const rotate = keyframes`
   to {
     transform: rotate(360deg);
   }
-`
+`;
 
 export const LoadingIcon = ({ size = "2.4rem", className = "" }) => (
   <svg
@@ -31,8 +31,8 @@ export const LoadingIcon = ({ size = "2.4rem", className = "" }) => (
       transform="rotate(25.6557 50 50)"
       sx={{
         animation: `${rotate} 1.5s infinite linear`,
-        transformOrigin: "50px 50px"
+        transformOrigin: "50px 50px",
       }}
     ></circle>
   </svg>
-)
+);

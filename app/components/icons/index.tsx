@@ -22,7 +22,7 @@ function DotsIcon({ className = "" }) {
       <path d="M12 12L12 12.01"></path>
       <path d="M16 12L16 12.01"></path>
     </svg>
-  )
+  );
 }
 
 export function SettingsIcon({ className = "" }) {
@@ -46,7 +46,7 @@ export function SettingsIcon({ className = "" }) {
       <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37 1 .608 2.296.07 2.572-1.065z"></path>
       <circle cx="12" cy="12" r="3"></circle>
     </svg>
-  )
+  );
 }
 
 export const CloseIcon = () => {
@@ -68,8 +68,8 @@ export const CloseIcon = () => {
       <path d="M18 6L6 18"></path>
       <path d="M6 6L18 18"></path>
     </svg>
-  )
-}
+  );
+};
 
 export const MenuIcon = () => {
   return (
@@ -91,8 +91,8 @@ export const MenuIcon = () => {
       <path d="M4 12L20 12"></path>
       <path d="M4 18L20 18"></path>
     </svg>
-  )
-}
+  );
+};
 
 const SolanaLogo = () => {
   return (
@@ -157,8 +157,8 @@ const SolanaLogo = () => {
         </clipPath>
       </defs>
     </svg>
-  )
-}
+  );
+};
 
 function DiscordIcon({ className = "" }) {
   return (
@@ -183,7 +183,7 @@ function DiscordIcon({ className = "" }) {
       <path d="M7.5 7.5c3.5-1 5.5-1 9 0M7 16.5c3.5 1 6.5 1 10 0"></path>
       <path d="M15.5 17c0 1 1.5 3 2 3 1.5 0 2.833-1.667 3.5-3 .667-1.667.5-5.833-1.5-11.5-1.457-1.015-3-1.34-4.5-1.5l-1 2.5M8.5 17c0 1-1.356 3-1.832 3-1.429 0-2.698-1.667-3.333-3-.635-1.667-.476-5.833 1.428-11.5C6.151 4.485 7.545 4.16 9 4l1 2.5"></path>
     </svg>
-  )
+  );
 }
 
 function TwitterIcon({ className = "" }) {
@@ -206,7 +206,7 @@ function TwitterIcon({ className = "" }) {
       <path stroke="none" d="M0 0h24v24H0z"></path>
       <path d="M22 4.01c-1 .49-1.98.689-3 .99-1.121-1.265-2.783-1.335-4.38-.737S11.977 6.323 12 8v1c-3.245.083-6.135-1.395-8-4 0 0-4.182 7.433 4 11-1.872 1.247-3.739 2.088-6 2 3.308 1.803 6.913 2.423 10.034 1.517 3.58-1.04 6.522-3.723 7.651-7.742a13.84 13.84 0 00.497-3.753C20.18 7.773 21.692 5.25 22 4.009z"></path>
     </svg>
-  )
+  );
 }
 
 function PlusSign({ className = "" }) {
@@ -231,7 +231,7 @@ function PlusSign({ className = "" }) {
       <path d="M12 5L12 19"></path>
       <path d="M5 12L19 12"></path>
     </svg>
-  )
+  );
 }
 
 function SolanaLogoMark({ className = "" }) {
@@ -265,7 +265,7 @@ function SolanaLogoMark({ className = "" }) {
         </linearGradient>
       </defs>
     </svg>
-  )
+  );
 }
 
 export {
@@ -275,4 +275,4 @@ export {
   SolanaLogo,
   DiscordIcon,
   TwitterIcon,
-}
+};

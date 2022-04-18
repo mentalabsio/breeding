@@ -1,15 +1,15 @@
 /** @jsxImportSource theme-ui */
 
-import useWalletNFTs from "@/hooks/useWalletNFTs"
-import Select, { StylesConfig } from "react-select"
-import { useThemeUI, Flex } from "theme-ui"
+import useWalletNFTs from "@/hooks/useWalletNFTs";
+import Select, { StylesConfig } from "react-select";
+import { useThemeUI, Flex } from "theme-ui";
 
 const SelectorNFTOptionLabel = ({
   imgSrc,
   name,
 }: {
-  imgSrc: string
-  name: string
+  imgSrc: string;
+  name: string;
 }) => {
   return (
     <Flex
@@ -26,12 +26,12 @@ const SelectorNFTOptionLabel = ({
       />
       {name}
     </Flex>
-  )
-}
+  );
+};
 
 const NFTSelector = ({ name }: { name: string }) => {
-  const { theme } = useThemeUI()
-  const { walletNFTs } = useWalletNFTs()
+  const { theme } = useThemeUI();
+  const { walletNFTs } = useWalletNFTs();
 
   const options = walletNFTs.map((NFT) => ({
     value: NFT.mint,
@@ -41,7 +41,7 @@ const NFTSelector = ({ name }: { name: string }) => {
         name={NFT.onchainMetadata.data.name}
       />
     ),
-  }))
+  }));
 
   const colourStyles: StylesConfig = {
     control: (styles) => ({
@@ -80,14 +80,14 @@ const NFTSelector = ({ name }: { name: string }) => {
           ...styles[":active"],
           backgroundColor: !isDisabled ? "#333" : undefined,
         },
-      }
+      };
     },
     singleValue: (styles) => ({
       ...styles,
       color: theme?.colors.text.toString(),
     }),
-  }
+  };
 
-  return <Select name={name} options={options} styles={colourStyles} />
-}
-export default NFTSelector
+  return <Select name={name} options={options} styles={colourStyles} />;
+};
+export default NFTSelector;

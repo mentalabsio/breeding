@@ -1,18 +1,16 @@
 /** @jsxImportSource theme-ui */
 
-import { Flex, Spinner, Text } from "@theme-ui/components"
-import useWalletNFTs from "@/hooks/useWalletNFTs"
-import CollectionItem from "@/components/NFTGallery/CollectionItem"
-import { useWallet } from "@solana/wallet-adapter-react"
-
-export type NFTCollectionProps = {}
+import CollectionItem from "@/components/NFTGallery/CollectionItem";
+import useWalletNFTs from "@/hooks/useWalletNFTs";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { Flex, Spinner, Text } from "@theme-ui/components";
 
 /**
  * Component to displays all NFTs from a connected wallet
  */
-export function NFTGallery(props: NFTCollectionProps) {
-  const { publicKey } = useWallet()
-  const { walletNFTs } = useWalletNFTs()
+export function NFTGallery() {
+  const { publicKey } = useWallet();
+  const { walletNFTs } = useWalletNFTs();
 
   return (
     <>
@@ -51,7 +49,7 @@ export function NFTGallery(props: NFTCollectionProps) {
                       maxWidth: "8rem",
                     }}
                   />
-                )
+                );
               })}
             </div>
           </Flex>
@@ -78,5 +76,5 @@ export function NFTGallery(props: NFTCollectionProps) {
         </Flex>
       ) : null}
     </>
-  )
+  );
 }

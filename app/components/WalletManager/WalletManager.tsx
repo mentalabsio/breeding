@@ -1,10 +1,10 @@
 /** @jsxImportSource theme-ui */
-import { useWallet } from "@solana/wallet-adapter-react"
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui"
-import { Flex } from "theme-ui"
+import { useWallet } from "@solana/wallet-adapter-react";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { Flex } from "theme-ui";
 
 const WalletManager = () => {
-  const wallet = useWallet()
+  const wallet = useWallet();
 
   return (
     <Flex
@@ -80,7 +80,7 @@ const WalletManager = () => {
         )}
       </Flex>
     </Flex>
-  )
-}
+  );
+};
 
-export default WalletManager
+export default WalletManager;
