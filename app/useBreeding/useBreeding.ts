@@ -11,7 +11,7 @@ import {
   findBreedDataAddress,
   findBreedingMachineAddress,
   findWhitelistTokenAddress,
-} from "./utils"
+} from "../utils/breeding"
 
 const candyMachineAddress = new web3.PublicKey(
   "2foGcTHZ2C9c5xQrBopgLyNxQ33rdSxwDXqHJbv34Fvs"
@@ -173,7 +173,7 @@ export const useBreeding = () => {
       if (!mintParentA || !mintParentB)
         throw new Error("Mint addresses are missing.")
 
-      setFeedbackStatus("[Breed] Initializing...")
+      // setFeedbackStatus("[Breed] Initializing...")
 
       const breedData = findBreedDataAddress(
         breedingMachine,
@@ -215,7 +215,7 @@ export const useBreeding = () => {
         owner: anchorWallet.publicKey,
       })
 
-      setFeedbackStatus("[Breed] Fetching accounts...")
+      // setFeedbackStatus("[Breed] Fetching accounts...")
       const feePayerAtaAccountInfo = await connection.getAccountInfo(
         feePayerAtaAddress
       )
@@ -259,7 +259,7 @@ export const useBreeding = () => {
 
       const feePrice = new BN(1000000000)
 
-      setFeedbackStatus("[Breed] Sending transaction...")
+      // setFeedbackStatus("[Breed] Sending transaction...")
       const tx = await anchorProgram.methods
         .initializeBreeding(feePrice)
         .accounts({
@@ -286,19 +286,19 @@ export const useBreeding = () => {
 
       console.log(tx)
 
-      setFeedbackStatus("[Breed] Confirming transaction...")
+      // setFeedbackStatus("[Breed] Confirming transaction...")
 
       await connection.confirmTransaction(tx, "confirmed")
 
-      setFeedbackStatus("Success!")
+      // setFeedbackStatus("Success!")
 
       setTimeout(() => {
-        setFeedbackStatus("")
+        // setFeedbackStatus("")
       }, 6000)
     } catch (e) {
       console.log(e)
 
-      setFeedbackStatus("Something went wrong. " + e + "")
+      // setFeedbackStatus("Something went wrong. " + e + "")
     }
   }
 

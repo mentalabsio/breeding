@@ -2,6 +2,7 @@
   "env": {
     "es2021": true
   },
+  "semi": false,
   "extends": [
     "plugin:@typescript-eslint/recommended",
     "prettier",

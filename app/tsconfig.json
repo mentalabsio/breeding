@@ -31,7 +31,10 @@
       ],
       "@/hooks/*": [
         "hooks/*"
-      ]
+      ],
+      "@/utils/*": [
+        "utils/*"
+      ],
     }
   },
   "include": [

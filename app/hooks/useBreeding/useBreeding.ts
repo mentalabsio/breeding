@@ -11,7 +11,7 @@ import {
   findBreedDataAddress,
   findBreedingMachineAddress,
   findWhitelistTokenAddress,
-} from "./utils"
+} from "@/utils/breeding"
 
 const candyMachineAddress = new web3.PublicKey(
   "2foGcTHZ2C9c5xQrBopgLyNxQ33rdSxwDXqHJbv34Fvs"
