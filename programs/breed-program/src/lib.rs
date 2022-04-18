@@ -19,16 +19,17 @@ pub mod breed_program {
         ctx.accounts.breeding_machine.set_inner(machine);
 
         let bump = *ctx.bumps.get("breeding_machine").unwrap();
-        let auth_seeds = &[
+        let machine_seeds = &[
             BreedMachine::PREFIX,
             config.parents_candy_machine.as_ref(),
             config.reward_candy_machine.as_ref(),
+            ctx.accounts.breeding_machine.authority.as_ref(),
             &[bump],
         ];
 
         // Mint the whitelist supply.
         anchor_spl::token::mint_to(
-            ctx.accounts.mint_to_ctx().with_signer(&[&*auth_seeds]),
+            ctx.accounts.mint_to_ctx().with_signer(&[&*machine_seeds]),
             config.reward_supply,
         )?;
 
@@ -36,7 +37,7 @@ pub mod breed_program {
         anchor_spl::token::set_authority(
             ctx.accounts
                 .set_authority_ctx()
-                .with_signer(&[&*auth_seeds]),
+                .with_signer(&[&*machine_seeds]),
             AuthorityType::MintTokens,
             None,
         )?;
@@ -104,6 +105,7 @@ pub mod breed_program {
             BreedMachine::PREFIX,
             config.parents_candy_machine.as_ref(),
             config.reward_candy_machine.as_ref(),
+            ctx.accounts.breeding_machine.authority.as_ref(),
             &[machine_bump],
         ];
 

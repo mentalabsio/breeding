@@ -1,22 +1,23 @@
-import { Idl, Program, utils, web3, BN } from "@project-serum/anchor"
+import { Idl, Program, utils, web3 } from "@project-serum/anchor";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
   TOKEN_PROGRAM_ID,
-} from "@solana/spl-token"
-import { AnchorWallet, WalletContextState } from "@solana/wallet-adapter-react"
+} from "@solana/spl-token";
+import { AnchorWallet, WalletContextState } from "@solana/wallet-adapter-react";
 
 const programId = new web3.PublicKey(
   "CikztTpnE9wiNzafzTCSzE4tXKFi5iHcGKzBhpNTiP7p"
-)
+);
 
 const incineratorAddress = new web3.PublicKey(
   "1nc1nerator11111111111111111111111111111111"
-)
+);
 
 export const findBreedingMachineAddress = (
   parentsCandyMachine: web3.PublicKey,
   rewardCandyMachine: web3.PublicKey,
+  authority: web3.PublicKey,
   breedingProgram: web3.PublicKey
 ) =>
   utils.publicKey.findProgramAddressSync(
@@ -24,9 +25,10 @@ export const findBreedingMachineAddress = (
       Buffer.from("breed_machine"),
       parentsCandyMachine.toBuffer(),
       rewardCandyMachine.toBuffer(),
+      authority.toBuffer(),
     ],
     breedingProgram
-  )[0]
+  )[0];
 
 export const findBreedDataAddress = (
   breedMachineAddress: web3.PublicKey,
@@ -42,7 +44,7 @@ export const findBreedDataAddress = (
       mintAddressB.toBuffer(),
     ],
     breedingProgram
-  )[0]
+  )[0];
 
 export const findWhitelistTokenAddress = (
   breedingMachine: web3.PublicKey,
@@ -51,7 +53,7 @@ export const findWhitelistTokenAddress = (
   utils.publicKey.findProgramAddressSync(
     [Buffer.from("whitelist_token"), breedingMachine.toBuffer()],
     breedingProgram
-  )[0]
+  )[0];
 
 /**
  * Handles init and terminate breeding
@@ -71,7 +73,7 @@ export const createBreeding = (
   const whitelistToken = findWhitelistTokenAddress(
     breedingMachineAddress,
     programId
-  )
+  );
 
   const init = async (
     mintParentA: web3.PublicKey,
@@ -80,39 +82,41 @@ export const createBreeding = (
   ) => {
     try {
       if (!mintParentA || !mintParentB)
-        throw new Error("Mint addresses are missing.")
+        throw new Error("Mint addresses are missing.");
 
       const breedingMachineAccount =
-        await breedingProgram.account.breedMachine.fetch(breedingMachineAddress)
+        await breedingProgram.account.breedMachine.fetch(
+          breedingMachineAddress
+        );
 
-      const feeToken = breedingMachineAccount.config.initializationFeeToken
+      const feeToken = breedingMachineAccount.config.initializationFeeToken;
 
       const breedData = findBreedDataAddress(
         breedingMachineAddress,
         mintParentA,
         mintParentB,
         programId
-      )
+      );
 
       const userAtaParentA = await utils.token.associatedAddress({
         mint: mintParentA,
         owner: userWallet.publicKey,
-      })
+      });
 
       const userAtaParentB = await utils.token.associatedAddress({
         mint: mintParentB,
         owner: userWallet.publicKey,
-      })
+      });
 
       const vaultAtaParentA = await utils.token.associatedAddress({
         mint: mintParentA,
         owner: breedData,
-      })
+      });
 
       const vaultAtaParentB = await utils.token.associatedAddress({
         mint: mintParentB,
         owner: breedData,
-      })
+      });
 
       /**
        * Additional instructions:
@@ -120,16 +124,16 @@ export const createBreeding = (
        * Create ATA for fee payer if necessary
        * Create ATA for incinerator if necessary
        */
-      const additionalInstructions = []
+      const additionalInstructions = [];
 
       const feePayerAtaAddress = await utils.token.associatedAddress({
         mint: feeToken,
         owner: userWallet.publicKey,
-      })
+      });
 
       const feePayerAtaAccountInfo = await connection.getAccountInfo(
         feePayerAtaAddress
-      )
+      );
 
       if (!feePayerAtaAccountInfo) {
         const createAtaInstruction =
@@ -140,19 +144,19 @@ export const createBreeding = (
             feePayerAtaAddress,
             userWallet.publicKey,
             userWallet.publicKey
-          )
+          );
 
-        additionalInstructions.push(createAtaInstruction)
+        additionalInstructions.push(createAtaInstruction);
       }
 
       const feeIncineratorAtaAddress = await utils.token.associatedAddress({
         mint: feeToken,
         owner: incineratorAddress,
-      })
+      });
 
       const feeIncineratorAtaAccountInfo = await connection.getAccountInfo(
         feeIncineratorAtaAddress
-      )
+      );
 
       if (!feeIncineratorAtaAccountInfo) {
         const createAtaInstruction =
@@ -163,9 +167,9 @@ export const createBreeding = (
             feeIncineratorAtaAddress,
             incineratorAddress,
             userWallet.publicKey
-          )
+          );
 
-        additionalInstructions.push(createAtaInstruction)
+        additionalInstructions.push(createAtaInstruction);
       }
 
       // setFeedbackStatus("[Breed] Sending transaction...")
@@ -191,7 +195,7 @@ export const createBreeding = (
         })
         .preInstructions(additionalInstructions)
         .signers(signers)
-        .rpc()
+        .rpc();
 
       return {
         tx,
@@ -199,13 +203,13 @@ export const createBreeding = (
         userAtaParentB,
         vaultAtaParentA,
         vaultAtaParentB,
-      }
+      };
     } catch (e) {
-      console.log(e)
+      console.log(e);
 
-      throw e
+      throw e;
     }
-  }
+  };
 
   const terminate = async (
     mintParentA: web3.PublicKey,
@@ -213,44 +217,44 @@ export const createBreeding = (
     signers: web3.Keypair[] = []
   ) => {
     if (!mintParentA || !mintParentB)
-      throw new Error("Mint addresses are missing.")
+      throw new Error("Mint addresses are missing.");
 
     const breedData = findBreedDataAddress(
       breedingMachineAddress,
       mintParentA,
       mintParentB,
       programId
-    )
+    );
 
     const userAtaParentA = await utils.token.associatedAddress({
       mint: mintParentA,
       owner: userWallet.publicKey,
-    })
+    });
 
     const userAtaParentB = await utils.token.associatedAddress({
       mint: mintParentB,
       owner: userWallet.publicKey,
-    })
+    });
 
     const vaultAtaParentA = await utils.token.associatedAddress({
       mint: mintParentA,
       owner: breedData,
-    })
+    });
 
     const vaultAtaParentB = await utils.token.associatedAddress({
       mint: mintParentB,
       owner: breedData,
-    })
+    });
 
     const whitelistVault = await utils.token.associatedAddress({
       mint: whitelistToken,
       owner: breedingMachineAddress,
-    })
+    });
 
     const userWhitelistAta = await utils.token.associatedAddress({
       mint: whitelistToken,
       owner: userWallet.publicKey,
-    })
+    });
 
     const tx = await breedingProgram.methods
       .finalizeBreeding()
@@ -274,10 +278,10 @@ export const createBreeding = (
         userWallet: userWallet.publicKey,
       })
       .signers(signers)
-      .rpc()
+      .rpc();
 
-    return { tx, userWhitelistAta, breedData, userAtaParentB, userAtaParentA }
-  }
+    return { tx, userWhitelistAta, breedData, userAtaParentB, userAtaParentA };
+  };
 
-  return { init, terminate }
-}
+  return { init, terminate };
+};
