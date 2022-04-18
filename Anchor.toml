@@ -57,3 +57,48 @@ address = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
 # Token metadata program
 [[test.validator.clone]]
 address = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
+
+
+
+
+# NFTs
+
+# holder wallet
+[[test.validator.clone]]
+address = "ViVDtpVYKdhRRH9FTKsh6reJB9xXUqpX1233BSDZWRQ"
+
+# program idl
+[[test.validator.clone]]
+address = "DTddp5dRUfTYrrPjkdSxZqg1TkyEprbYhJpmNpLd8tSf"
+
+
+
+# nft mint
+[[test.validator.clone]]
+address = "41jKeBpGH6Ur46r9fMc8JjyAbXitTB5BAdo7SGF82RoY"
+
+# nft holder account
+[[test.validator.clone]]
+address = "7U1G1DJAm51evMyN6RM7SyRAkrfGEC7B2CBc4CYnQthE"
+
+
+# nft metadata
+[[test.validator.clone]]
+address = "4cJ8hMuocWqJ8gmiviHEduv5X9EmagFPk5Uba16b4Zvh"
+
+
+
+# nft 2 mint
+[[test.validator.clone]]
+address = "FbgRi6cUD581knBjtovPYajdRp8fEqVDgJLVhK3V8372"
+
+# nft 2 holder account
+[[test.validator.clone]]
+address = "Ax6gAkkBKWcKSRU2vitdPwiw6hFK3xL9wZ6GRCAuYPhA"
+
+
+# nft 2 metadata
+[[test.validator.clone]]
+address = "9umFMEbzrXjPqkcbUCcedzWosVzuaGz8Pm2ugeFeA4kM"
+
+
