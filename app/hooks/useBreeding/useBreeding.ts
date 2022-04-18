@@ -34,6 +34,7 @@ export const useBreeding = () => {
   const [breedingMachineAccount, setBreedingMachineAccount] = useState(null)
   const [userBreedDatas, setUserBreedDatas] = useState(null)
   const [feedbackStatus, setFeedbackStatus] = useState("")
+  const [userTokenBalance, setUserTokenBalance] = useState(null)
 
   const { init, terminate } = createBreeding(
     connection,
@@ -131,6 +132,30 @@ export const useBreeding = () => {
     }
   }, [connection, anchorWallet])
 
+  /** Fetch wallet token balance */
+  useEffect(() => {
+    const fetchBalance = async () => {
+      console.log("dfsdfsdfsd")
+      try {
+        const addr = await utils.token.associatedAddress({
+          mint: breedingMachineAccount?.config.initializationFeeToken,
+          owner: anchorWallet.publicKey,
+        })
+
+        console.log(addr)
+
+        const balance = await connection.getTokenAccountBalance(addr)
+        setUserTokenBalance(balance)
+      } catch (e) {
+        console.log("Couldn't fetch token balance. " + e)
+      }
+    }
+
+    if (anchorWallet?.publicKey && breedingMachineAccount?.config) {
+      fetchBalance()
+    }
+  }, [anchorWallet?.publicKey, breedingMachineAccount])
+
   const initializeBreedingMachine = async () => {
     const config = {
       burnParents: false,
@@ -227,5 +252,6 @@ export const useBreeding = () => {
     breedingMachineAccount,
     userBreedDatas,
     feedbackStatus,
+    userTokenBalance,
   }
 }

@@ -1,17 +1,17 @@
 /** @jsxImportSource theme-ui */
 
-import Header from "@/components/Header/Header";
-import { PlusSign } from "@/components/icons";
-import { LoadingIcon } from "@/components/icons/LoadingIcon";
-import NFTSelector from "@/components/NFTSelector/NFTSelector";
-import { useBreeding } from "@/hooks/useBreeding/useBreeding";
-import { web3 } from "@project-serum/anchor";
-import { useAnchorWallet } from "@solana/wallet-adapter-react";
-import { Button, Flex, Heading, Text } from "@theme-ui/components";
-import Head from "next/head";
+import Header from "@/components/Header/Header"
+import { PlusSign } from "@/components/icons"
+import { LoadingIcon } from "@/components/icons/LoadingIcon"
+import NFTSelector from "@/components/NFTSelector/NFTSelector"
+import { useBreeding } from "@/hooks/useBreeding/useBreeding"
+import { web3 } from "@project-serum/anchor"
+import { useAnchorWallet } from "@solana/wallet-adapter-react"
+import { Button, Flex, Heading, Text } from "@theme-ui/components"
+import Head from "next/head"
 
 export default function Home() {
-  const anchorWallet = useAnchorWallet();
+  const anchorWallet = useAnchorWallet()
   const {
     initializeBreeding,
     terminateBreeding,
@@ -19,9 +19,13 @@ export default function Home() {
     breedingMachineAccount,
     userBreedDatas,
     feedbackStatus,
-  } = useBreeding();
+    userTokenBalance,
+  } = useBreeding()
 
-  console.log(breedingMachineAccount);
+  console.log(breedingMachineAccount)
+  console.log(breedingMachineAccount?.config.initializationFeePrice.toNumber())
+  const cost = breedingMachineAccount?.config.initializationFeePrice.toNumber()
+
   return (
     <>
       <Head>
@@ -52,7 +56,7 @@ export default function Home() {
             <hr />
             <Text>
               Burn parents:{" "}
-              {breedingMachineAccount.config.burnParents ? "Yes" : "No"}
+              {breedingMachineAccount?.config.burnParents ? "Yes" : "No"}
             </Text>
             <Text>
               Total breeding: {breedingMachineAccount.bred.toNumber()}
@@ -102,22 +106,22 @@ export default function Home() {
 
             <form
               onSubmit={async (e) => {
-                e.preventDefault();
+                e.preventDefault()
 
-                const data = new FormData(e.currentTarget);
-                const mints = data.getAll("mint").filter((val) => val);
+                const data = new FormData(e.currentTarget)
+                const mints = data.getAll("mint").filter((val) => val)
 
-                if (!anchorWallet?.publicKey) throw new Error("No public key.");
+                if (!anchorWallet?.publicKey) throw new Error("No public key.")
 
-                if (mints.length !== 2) return true;
+                if (mints.length !== 2) return true
 
                 const res = await initializeBreeding(
                   new web3.PublicKey(mints[0]),
                   new web3.PublicKey(mints[1])
-                );
+                )
 
-                console.log(res);
-                return res;
+                console.log(res)
+                return res
               }}
               sx={{
                 display: "flex",
@@ -150,14 +154,25 @@ export default function Home() {
 
                 <NFTSelector name="mint" />
               </Flex>
-              <Button
+              <Flex
                 sx={{
-                  alignSelf: "center",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: ".8rem",
                 }}
-                type="submit"
               >
-                breed!
-              </Button>
+                <Text>
+                  {cost && "Cost: " + cost} | Balance: {userTokenBalance || "0"}
+                </Text>
+                <Button
+                  sx={{
+                    alignSelf: "center",
+                  }}
+                  type="submit"
+                >
+                  breed!
+                </Button>
+              </Flex>
             </form>
 
             <hr
@@ -260,5 +275,5 @@ export default function Home() {
         </a>
       </footer>
     </>
-  );
+  )
 }
