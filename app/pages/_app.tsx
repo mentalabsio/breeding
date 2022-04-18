@@ -9,7 +9,7 @@ import "@solana/wallet-adapter-react-ui/styles.css"
 // @ts-ignore
 import withGA from "next-ga"
 
-import defaultTheme from "../styles/theme"
+import defaultTheme from "@/styles/theme"
 
 const WalletProvider = dynamic(
   () => import("@/components/WalletProvider/WalletProvider"),
