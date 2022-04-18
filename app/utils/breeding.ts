@@ -4,7 +4,7 @@ import {
   Token,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token"
-import { WalletContextState } from "@solana/wallet-adapter-react"
+import { AnchorWallet, WalletContextState } from "@solana/wallet-adapter-react"
 
 const programId = new web3.PublicKey(
   "CikztTpnE9wiNzafzTCSzE4tXKFi5iHcGKzBhpNTiP7p"
@@ -66,7 +66,7 @@ export const createBreeding = (
   connection: web3.Connection,
   breedingProgram: Program<Idl>,
   breedingMachineAddress: web3.PublicKey,
-  userWallet: WalletContextState | web3.Keypair
+  userWallet: WalletContextState | web3.Keypair | AnchorWallet
 ) => {
   const whitelistToken = findWhitelistTokenAddress(
     breedingMachineAddress,
