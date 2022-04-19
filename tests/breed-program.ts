@@ -130,11 +130,6 @@ describe("breed-program", () => {
     const breedMintBBalance =
       await program.provider.connection.getTokenAccountBalance(vaultAtaParentB);
 
-    const breedMachineAccount = await program.account.breedMachine.fetch(
-      breedingMachine
-    );
-
-    expect(breedMachineAccount.bred.toNumber()).to.equal(2);
     expect(userMintABalance.value.uiAmount).to.equal(0);
     expect(userMintBBalance.value.uiAmount).to.equal(0);
     expect(breedMintABalance.value.uiAmount).to.equal(1);
@@ -165,11 +160,12 @@ describe("breed-program", () => {
         userWhitelistAta
       );
 
-    expect(userWhitelistTokenBalance.value.uiAmount).to.equal(1);
     expect(oldBreedAccount).to.be.null;
     expect(breedMachineAccount.born.toNumber()).to.equal(1);
+    expect(breedMachineAccount.bred.toNumber()).to.equal(2);
     expect(userMintABalance.value.uiAmount).to.equal(1);
     expect(userMintBBalance.value.uiAmount).to.equal(1);
+    expect(userWhitelistTokenBalance.value.uiAmount).to.equal(1);
   });
 
   it("should be able to cancel a breeding", async () => {
@@ -199,6 +195,7 @@ describe("breed-program", () => {
 
     expect(oldBreedAccount).to.be.null;
     expect(breedMachineAccount.born.toNumber()).to.equal(1);
+    expect(breedMachineAccount.bred.toNumber()).to.equal(2);
     expect(userMintABalance.value.uiAmount).to.equal(1);
     expect(userMintBBalance.value.uiAmount).to.equal(1);
   });

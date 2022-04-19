@@ -64,13 +64,6 @@ pub mod breed_program {
         ctx.accounts.breed_data.set_inner(breed_account);
         ctx.accounts.lock_parents()?;
 
-        ctx.accounts.breeding_machine.bred = ctx
-            .accounts
-            .breeding_machine
-            .bred
-            .checked_add(2)
-            .ok_or(BreedingError::ArithmeticError)?;
-
         msg!("BreedingProgram: Breeding initialized.");
         msg!("BreedingProgram: Parents locked.");
 
@@ -114,7 +107,15 @@ pub mod breed_program {
             1,
         )?;
 
-        // Increment born counter
+        // Increment bred counter.
+        ctx.accounts.breeding_machine.bred = ctx
+            .accounts
+            .breeding_machine
+            .bred
+            .checked_add(2)
+            .ok_or(BreedingError::ArithmeticError)?;
+
+        // Increment born counter.
         ctx.accounts.breeding_machine.born = ctx
             .accounts
             .breeding_machine
