@@ -1,10 +1,10 @@
-use crate::{BreedConfig, BreedData, BreedMachine};
+use crate::{BreedConfig, BreedData, BreedMachine, BreedingError};
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
     token::{Burn, CloseAccount, Mint, MintTo, SetAuthority, Token, TokenAccount, Transfer},
 };
-use solutils::charge::Chargeable;
+use solutils::{charge::Chargeable, wrappers::metadata::MetadataAccount};
 
 #[derive(Accounts)]
 #[instruction(config: BreedConfig)]
@@ -100,7 +100,11 @@ pub struct InitializeBreed<'info> {
     pub breed_data: Account<'info, BreedData>,
 
     pub mint_parent_a: Account<'info, Mint>,
-    pub mint_parent_b: Account<'info, Mint>,
+
+    #[account(
+        constraint = metadata_parent_a.mint == mint_parent_a.key(),
+    )]
+    pub metadata_parent_a: Box<Account<'info, MetadataAccount>>,
 
     #[account(
         mut,
@@ -110,19 +114,26 @@ pub struct InitializeBreed<'info> {
     pub user_ata_parent_a: Box<Account<'info, TokenAccount>>,
 
     #[account(
-        mut,
-        associated_token::mint = mint_parent_b,
-        associated_token::authority = user_wallet
-    )]
-    pub user_ata_parent_b: Box<Account<'info, TokenAccount>>,
-
-    #[account(
         init,
         payer = user_wallet,
         associated_token::mint = mint_parent_a,
         associated_token::authority = breed_data
     )]
     pub vault_ata_parent_a: Box<Account<'info, TokenAccount>>,
+
+    pub mint_parent_b: Account<'info, Mint>,
+
+    #[account(
+        constraint = metadata_parent_b.mint == mint_parent_b.key(),
+    )]
+    pub metadata_parent_b: Box<Account<'info, MetadataAccount>>,
+
+    #[account(
+        mut,
+        associated_token::mint = mint_parent_b,
+        associated_token::authority = user_wallet
+    )]
+    pub user_ata_parent_b: Box<Account<'info, TokenAccount>>,
 
     #[account(
         init,
@@ -151,9 +162,30 @@ pub struct InitializeBreed<'info> {
     pub system_program: Program<'info, System>,
 }
 
+fn verify_creator(metadata: &MetadataAccount, creator_address: Pubkey) -> Result<()> {
+    metadata
+        .data
+        .creators
+        .as_ref()
+        .filter(|c| c.iter().any(|c| c.address == creator_address && c.verified))
+        .ok_or(BreedingError::InvalidNftCollection)?;
+    Ok(())
+}
+
 impl<'info> InitializeBreed<'info> {
-    pub fn validate_nfts(_ctx: &Context<Self>) -> Result<()> {
+    pub fn validate_nfts(ctx: &Context<Self>) -> Result<()> {
         // TODO: validate parents verified creator.
+
+        verify_creator(
+            &*ctx.accounts.metadata_parent_a,
+            ctx.accounts.breeding_machine.config.parents_candy_machine,
+        )?;
+
+        verify_creator(
+            &*ctx.accounts.metadata_parent_b,
+            ctx.accounts.breeding_machine.config.parents_candy_machine,
+        )?;
+
         Ok(())
     }
 
@@ -345,4 +377,146 @@ impl<'info> FinalizeBreeding<'info> {
 
         CpiContext::new(self.token_program.to_account_info(), accounts)
     }
+}
+
+#[derive(Accounts)]
+pub struct CancelBreeding<'info> {
+    #[account(mut)]
+    pub breeding_machine: Account<'info, BreedMachine>,
+
+    #[account(
+        mut,
+        close = user_wallet,
+        seeds = [
+            BreedData::PREFIX,
+            breeding_machine.key().as_ref(),
+            mint_parent_a.key().as_ref(),
+            mint_parent_b.key().as_ref(),
+        ],
+        bump
+    )]
+    pub breed_data: Account<'info, BreedData>,
+
+    #[account(address = breed_data.mint_a)]
+    pub mint_parent_a: Account<'info, Mint>,
+    #[account(address = breed_data.mint_b)]
+    pub mint_parent_b: Account<'info, Mint>,
+
+    #[account(
+        mut,
+        associated_token::mint = mint_parent_a,
+        associated_token::authority = user_wallet
+    )]
+    pub user_ata_parent_a: Box<Account<'info, TokenAccount>>,
+
+    #[account(
+        mut,
+        associated_token::mint = mint_parent_b,
+        associated_token::authority = user_wallet
+    )]
+    pub user_ata_parent_b: Box<Account<'info, TokenAccount>>,
+
+    #[account(
+        mut,
+        close = breed_data,
+        associated_token::mint = mint_parent_a,
+        associated_token::authority = breed_data
+    )]
+    pub vault_ata_parent_a: Box<Account<'info, TokenAccount>>,
+
+    #[account(
+        mut,
+        close = breed_data,
+        associated_token::mint = mint_parent_b,
+        associated_token::authority = breed_data
+    )]
+    pub vault_ata_parent_b: Box<Account<'info, TokenAccount>>,
+
+    #[account(mut)]
+    pub user_wallet: Signer<'info>,
+
+    pub token_program: Program<'info, Token>,
+}
+
+impl<'info> CancelBreeding<'info> {
+    fn return_parents(&self, signer_seeds: &[&[&[u8]]]) -> Result<()> {
+        let accounts = Transfer {
+            from: self.vault_ata_parent_a.to_account_info(),
+            to: self.user_ata_parent_a.to_account_info(),
+            authority: self.breed_data.to_account_info(),
+        };
+        let cpi = CpiContext::new(self.token_program.to_account_info(), accounts);
+        anchor_spl::token::transfer(cpi.with_signer(signer_seeds), 1)?;
+
+        let accounts = Transfer {
+            from: self.vault_ata_parent_b.to_account_info(),
+            to: self.user_ata_parent_b.to_account_info(),
+            authority: self.breed_data.to_account_info(),
+        };
+        let cpi = CpiContext::new(self.token_program.to_account_info(), accounts);
+        anchor_spl::token::transfer(cpi.with_signer(signer_seeds), 1)?;
+
+        Ok(())
+    }
+
+    fn close_parent_vaults(&self, signer_seeds: &[&[&[u8]]]) -> Result<()> {
+        let accounts = CloseAccount {
+            account: self.vault_ata_parent_a.to_account_info(),
+            destination: self.breed_data.to_account_info(),
+            authority: self.breed_data.to_account_info(),
+        };
+        let cpi = CpiContext::new(self.token_program.to_account_info(), accounts);
+        anchor_spl::token::close_account(cpi.with_signer(signer_seeds))?;
+
+        let accounts = CloseAccount {
+            account: self.vault_ata_parent_b.to_account_info(),
+            destination: self.breed_data.to_account_info(),
+            authority: self.breed_data.to_account_info(),
+        };
+        let cpi = CpiContext::new(self.token_program.to_account_info(), accounts);
+        anchor_spl::token::close_account(cpi.with_signer(signer_seeds))?;
+
+        Ok(())
+    }
+
+    pub fn unlock_parents(&self, signer_seeds: &[&[&[u8]]]) -> Result<()> {
+        self.return_parents(signer_seeds)?;
+        self.close_parent_vaults(signer_seeds)
+    }
+}
+
+#[derive(Accounts)]
+pub struct CloseBreedMachine<'info> {
+    #[account(
+        mut,
+        close = authority,
+        has_one = authority,
+    )]
+    pub breeding_machine: Account<'info, BreedMachine>,
+
+    #[account(
+        init,
+        payer = authority,
+        mint::decimals = 0_u8,
+        mint::authority = breeding_machine,
+        seeds = [b"whitelist_token", breeding_machine.key().as_ref()],
+        bump,
+    )]
+    pub whitelist_token: Box<Account<'info, Mint>>,
+
+    #[account(
+        init,
+        payer = authority,
+        associated_token::mint = whitelist_token,
+        associated_token::authority = breeding_machine,
+    )]
+    pub whitelist_vault: Box<Account<'info, TokenAccount>>,
+
+    #[account(mut)]
+    pub authority: Signer<'info>,
+
+    pub rent: Sysvar<'info, Rent>,
+    pub token_program: Program<'info, Token>,
+    pub system_program: Program<'info, System>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
 }

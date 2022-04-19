@@ -125,7 +125,20 @@ pub mod breed_program {
         Ok(())
     }
 
-    // TODO: cancel breeding
+    pub fn cancel_breeding(ctx: Context<CancelBreeding>) -> Result<()> {
+        let breed_data_bump = *ctx.bumps.get("breed_data").unwrap();
+
+        ctx.accounts.unlock_parents(&[&[
+            BreedData::PREFIX,
+            ctx.accounts.breeding_machine.key().as_ref(),
+            ctx.accounts.mint_parent_a.key().as_ref(),
+            ctx.accounts.mint_parent_b.key().as_ref(),
+            &[breed_data_bump], // must come last
+        ]])?;
+
+        Ok(())
+    }
+
     // TODO: close breeding machine
 }
 
@@ -209,4 +222,6 @@ pub enum BreedingError {
     StillInProgress,
     #[msg("Arithmetic error occurred.")]
     ArithmeticError,
+    #[msg("Invalid NFT collection to breed in this machine.")]
+    InvalidNftCollection,
 }

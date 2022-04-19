@@ -1,4 +1,5 @@
-import { Idl, Program, utils, web3 } from "@project-serum/anchor"
+import { programs } from "@metaplex/js";
+import { Idl, Program, utils, web3 } from "@project-serum/anchor";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
@@ -170,6 +171,13 @@ export const createBreeding = (
         additionalInstructions.push(createAtaInstruction)
       }
 
+      const metadataParentA = await programs.metadata.Metadata.getPDA(
+        mintParentA
+      );
+      const metadataParentB = await programs.metadata.Metadata.getPDA(
+        mintParentB
+      );
+
       // setFeedbackStatus("[Breed] Sending transaction...")
       const tx = await breedingProgram.methods
         .initializeBreeding()
@@ -178,10 +186,12 @@ export const createBreeding = (
           breedData,
 
           mintParentA,
+          metadataParentA,
           userAtaParentA,
           vaultAtaParentA,
 
           mintParentB,
+          metadataParentB,
           userAtaParentB,
           vaultAtaParentB,
 

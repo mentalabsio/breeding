@@ -32,12 +32,18 @@ address = "9BeNtJPhQfV7iRGvgNGMC7Q8hBaiESE5YKQaHQTeiWRr"
 # Mint A
 [[test.validator.clone]]
 address = "4kZVPqN3b2CFUniF8bBdex32ziQ3FxbxhNYT3teV7Jkx"
+# Mint A metadata
+[[test.validator.clone]]
+address = "5e22jre9DQYKUZctASDaskucmahgmJJ8JtkubpYDZiqX"
 # User Mint A ATA
 [[test.validator.clone]]
 address = "Dip3H8tgZGnHqPSkMXiWrX2i64ZQRed63CaBo3FBKF4M"
 # Mint B
 [[test.validator.clone]]
 address = "2Z8esbcvecdEDXp6Py3HW3th9CAUJtTW5Df3Lz1m6qJC"
+# Mint B metadata
+[[test.validator.clone]]
+address = "6mdz34FCJ3tHhmwcwTpreT9D3ULeDgDAnSoTKNrBJvxm"
 # User Mint B ATA
 [[test.validator.clone]]
 address = "CdpebUieyDUgU6AEyk3dpzN7GGPdueoNMR6nYa5Eqtaf"
