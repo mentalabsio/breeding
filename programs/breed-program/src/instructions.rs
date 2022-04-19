@@ -17,6 +17,7 @@ pub struct InitializeBreedMachine<'info> {
             BreedMachine::PREFIX,
             config.parents_candy_machine.as_ref(),
             config.reward_candy_machine.as_ref(),
+            authority.key().as_ref(),
         ],
         bump
     )]
@@ -78,6 +79,7 @@ pub struct InitializeBreed<'info> {
             BreedMachine::PREFIX,
             breeding_machine.config.parents_candy_machine.as_ref(),
             breeding_machine.config.reward_candy_machine.as_ref(),
+            breeding_machine.authority.key().as_ref(),
         ],
         bump
     )]
@@ -184,6 +186,7 @@ pub struct FinalizeBreeding<'info> {
             BreedMachine::PREFIX,
             breeding_machine.config.parents_candy_machine.as_ref(),
             breeding_machine.config.reward_candy_machine.as_ref(),
+            breeding_machine.authority.key().as_ref(),
         ],
         bump
     )]
