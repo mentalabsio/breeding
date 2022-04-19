@@ -19,14 +19,6 @@ const programId = new web3.PublicKey(
   "CikztTpnE9wiNzafzTCSzE4tXKFi5iHcGKzBhpNTiP7p"
 )
 
-const breedingMachine = findBreedingMachineAddress(
-  candyMachineAddress,
-  candyMachineAddress,
-  programId
-)
-
-const whitelistToken = findWhitelistTokenAddress(breedingMachine, programId)
-
 export const useBreeding = () => {
   const { connection } = useConnection()
   const anchorWallet = useAnchorWallet()
@@ -35,13 +27,6 @@ export const useBreeding = () => {
   const [userBreedDatas, setUserBreedDatas] = useState(null)
   const [feedbackStatus, setFeedbackStatus] = useState("")
   const [userTokenBalance, setUserTokenBalance] = useState(null)
-
-  const { init, terminate } = createBreeding(
-    connection,
-    anchorProgram,
-    breedingMachine,
-    anchorWallet
-  )
 
   /**
    * Fetch IDL, breeding machine and breed datas on mount
@@ -70,6 +55,13 @@ export const useBreeding = () => {
 
       try {
         setFeedbackStatus("Fething breeding machine...")
+
+        const breedingMachine = findBreedingMachineAddress(
+          candyMachineAddress,
+          candyMachineAddress,
+          anchorWallet?.publicKey,
+          programId
+        )
 
         const machineAccount = await anchorProgram.account.breedMachine.fetch(
           breedingMachine
@@ -145,7 +137,7 @@ export const useBreeding = () => {
         console.log(addr)
 
         const balance = await connection.getTokenAccountBalance(addr)
-        setUserTokenBalance(balance)
+        setUserTokenBalance(balance.value.uiAmount.toLocaleString())
       } catch (e) {
         console.log("Couldn't fetch token balance. " + e)
       }
@@ -166,6 +158,15 @@ export const useBreeding = () => {
       rewardCandyMachine: candyMachineAddress,
       parentsCandyMachine: candyMachineAddress,
     }
+
+    const breedingMachine = findBreedingMachineAddress(
+      candyMachineAddress,
+      candyMachineAddress,
+      anchorWallet?.publicKey,
+      programId
+    )
+
+    const whitelistToken = findWhitelistTokenAddress(breedingMachine, programId)
 
     const whitelistVault = await utils.token.associatedAddress({
       mint: whitelistToken,
@@ -194,6 +195,20 @@ export const useBreeding = () => {
 
       if (!mintParentA || !mintParentB)
         throw new Error("Mint addresses are missing.")
+
+      const breedingMachine = findBreedingMachineAddress(
+        candyMachineAddress,
+        candyMachineAddress,
+        anchorWallet?.publicKey,
+        programId
+      )
+
+      const { init } = createBreeding(
+        connection,
+        anchorProgram,
+        breedingMachine,
+        anchorWallet
+      )
 
       setFeedbackStatus("[Breed] Initializing...")
 
@@ -224,6 +239,20 @@ export const useBreeding = () => {
 
       if (!mintParentA || !mintParentB)
         throw new Error("Mint addresses are missing.")
+
+      const breedingMachine = findBreedingMachineAddress(
+        candyMachineAddress,
+        candyMachineAddress,
+        anchorWallet?.publicKey,
+        programId
+      )
+
+      const { terminate } = createBreeding(
+        connection,
+        anchorProgram,
+        breedingMachine,
+        anchorWallet
+      )
 
       setFeedbackStatus("[Breed] Terminating...")
 
