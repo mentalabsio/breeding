@@ -54,7 +54,7 @@ describe("breed-program", () => {
     program.programId
   );
 
-  const { init, terminate } = createBreeding(
+  const { init, terminate, cancel } = createBreeding(
     program.provider.connection,
     program as any,
     breedingMachine,
@@ -166,6 +166,37 @@ describe("breed-program", () => {
       );
 
     expect(userWhitelistTokenBalance.value.uiAmount).to.equal(1);
+    expect(oldBreedAccount).to.be.null;
+    expect(breedMachineAccount.born.toNumber()).to.equal(1);
+    expect(userMintABalance.value.uiAmount).to.equal(1);
+    expect(userMintBBalance.value.uiAmount).to.equal(1);
+  });
+
+  it("should be able to cancel a breeding", async () => {
+    await init(mintParentA, mintParentB, [userWallet]);
+
+    const { tx, breedData, userAtaParentB, userAtaParentA } = await cancel(
+      mintParentA,
+      mintParentB,
+      [userWallet]
+    );
+
+    console.log("Your transaction signature", tx);
+
+    const userMintABalance =
+      await program.provider.connection.getTokenAccountBalance(userAtaParentA);
+
+    const userMintBBalance =
+      await program.provider.connection.getTokenAccountBalance(userAtaParentB);
+
+    const oldBreedAccount = await program.account.breedData.fetchNullable(
+      breedData
+    );
+
+    const breedMachineAccount = await program.account.breedMachine.fetch(
+      breedingMachine
+    );
+
     expect(oldBreedAccount).to.be.null;
     expect(breedMachineAccount.born.toNumber()).to.equal(1);
     expect(userMintABalance.value.uiAmount).to.equal(1);

@@ -418,7 +418,6 @@ pub struct CancelBreeding<'info> {
 
     #[account(
         mut,
-        close = breed_data,
         associated_token::mint = mint_parent_a,
         associated_token::authority = breed_data
     )]
@@ -426,7 +425,6 @@ pub struct CancelBreeding<'info> {
 
     #[account(
         mut,
-        close = breed_data,
         associated_token::mint = mint_parent_b,
         associated_token::authority = breed_data
     )]
@@ -481,42 +479,7 @@ impl<'info> CancelBreeding<'info> {
 
     pub fn unlock_parents(&self, signer_seeds: &[&[&[u8]]]) -> Result<()> {
         self.return_parents(signer_seeds)?;
-        self.close_parent_vaults(signer_seeds)
+        self.close_parent_vaults(signer_seeds)?;
+        Ok(())
     }
-}
-
-#[derive(Accounts)]
-pub struct CloseBreedMachine<'info> {
-    #[account(
-        mut,
-        close = authority,
-        has_one = authority,
-    )]
-    pub breeding_machine: Account<'info, BreedMachine>,
-
-    #[account(
-        init,
-        payer = authority,
-        mint::decimals = 0_u8,
-        mint::authority = breeding_machine,
-        seeds = [b"whitelist_token", breeding_machine.key().as_ref()],
-        bump,
-    )]
-    pub whitelist_token: Box<Account<'info, Mint>>,
-
-    #[account(
-        init,
-        payer = authority,
-        associated_token::mint = whitelist_token,
-        associated_token::authority = breeding_machine,
-    )]
-    pub whitelist_vault: Box<Account<'info, TokenAccount>>,
-
-    #[account(mut)]
-    pub authority: Signer<'info>,
-
-    pub rent: Sysvar<'info, Rent>,
-    pub token_program: Program<'info, Token>,
-    pub system_program: Program<'info, System>,
-    pub associated_token_program: Program<'info, AssociatedToken>,
 }
