@@ -75,7 +75,7 @@ pub mod breed_program {
         let breed_start_timestamp = ctx.accounts.breed_data.timestamp as u64;
         let breeding_time = ctx.accounts.breeding_machine.config.breeding_time;
 
-        if breed_start_timestamp + breeding_time < now_timestamp {
+        if breed_start_timestamp + breeding_time > now_timestamp {
             return Err(error!(BreedingError::StillInProgress));
         }
 
