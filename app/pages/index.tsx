@@ -5,7 +5,7 @@ import { PlusSign } from "@/components/icons"
 import { LoadingIcon } from "@/components/icons/LoadingIcon"
 import NFTSelector from "@/components/NFTSelector/NFTSelector"
 import { useBreeding } from "@/hooks/useBreeding/useBreeding"
-import { web3 } from "@project-serum/anchor"
+import { web3, BN } from "@project-serum/anchor"
 import { useAnchorWallet } from "@solana/wallet-adapter-react"
 import { Button, Flex, Heading, Text } from "@theme-ui/components"
 import Head from "next/head"
@@ -23,6 +23,9 @@ export default function Home() {
   } = useBreeding()
 
   const cost = breedingMachineAccount?.config.initializationFeePrice.toNumber()
+  const feeToken =
+    breedingMachineAccount?.config.initializationFeeToken.toString()
+  const breedingTime = breedingMachineAccount?.config.breedingTime.toNumber()
 
   return (
     <>
@@ -46,16 +49,19 @@ export default function Home() {
           Breed
         </Heading>
         <Text>Generate a new NFT from two!</Text>
-
-        <Button onClick={initializeBreedingMachine}>initialize</Button>
+        {/* 
+        <Button onClick={initializeBreedingMachine}>initialize</Button> */}
 
         {breedingMachineAccount && (
           <>
             <hr />
+            <Text>Fee token: {feeToken}</Text>
+            <Text>Breeding duration: {breedingTime}</Text>
             <Text>
               Burn parents:{" "}
               {breedingMachineAccount?.config.burnParents ? "Yes" : "No"}
             </Text>
+            <hr />
             <Text>
               Total breeding: {breedingMachineAccount.bred.toNumber()}
             </Text>

@@ -77,7 +77,13 @@ address = "ViVDtpVYKdhRRH9FTKsh6reJB9xXUqpX1233BSDZWRQ"
 [[test.validator.clone]]
 address = "DTddp5dRUfTYrrPjkdSxZqg1TkyEprbYhJpmNpLd8tSf"
 
+# ViV wallet feeToken
+[[test.validator.clone]]
+address = "6N4FqZM23cyWCNN3AcUFF9CpRuY1SYMqMRbfHTtB83M1"
 
+# ViV wallet feeToken ATA
+[[test.validator.clone]]
+address = "DmiTsvSV7aFGEmSRMYs9V857wfKmoxE9wpffz7Fi4WCc"
 
 # nft mint
 [[test.validator.clone]]

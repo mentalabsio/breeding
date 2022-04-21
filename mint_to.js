@@ -55,7 +55,7 @@ const { mintTo, createAssociatedTokenAccount } = require("@solana/spl-token")
   }
 
   console.log("Minting..")
-  const qty = 10 ** 9
+  const qty = 10 ** 10
   await mintTo(connection, keyPair, mint, ataAddress, keyPair, qty)
 
   console.log(`Minted ${qty} ${mint} to ${destinationWallet}!`)

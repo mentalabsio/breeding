@@ -19,6 +19,10 @@ const programId = new web3.PublicKey(
   "CikztTpnE9wiNzafzTCSzE4tXKFi5iHcGKzBhpNTiP7p"
 )
 
+const breedingMachineAuthority = new web3.PublicKey(
+  "7x4JZgW2oeAcra18oMC7Tudu9h6D5cYMJnjy8AbubBVW"
+)
+
 export const useBreeding = () => {
   const { connection } = useConnection()
   const anchorWallet = useAnchorWallet()
@@ -60,7 +64,7 @@ export const useBreeding = () => {
           candyMachineAddress,
           candyMachineAddress,
           /** Authority pubkey */
-          new web3.PublicKey("7x4JZgW2oeAcra18oMC7Tudu9h6D5cYMJnjy8AbubBVW"),
+          breedingMachineAuthority,
           programId
         )
 
@@ -103,10 +107,8 @@ export const useBreeding = () => {
           }
 
           return null
+          /** Error will be throwed if discriminator is invalid (not a breedData account) */
         } catch (e) {
-          /** Error will be throwed if discriminator is invalid */
-          console.log(e)
-
           return null
         }
       })
@@ -117,7 +119,6 @@ export const useBreeding = () => {
 
       setUserBreedDatas(breedDatas)
       setFeedbackStatus("")
-      console.log(breedDatas)
     }
 
     if (connection && anchorWallet?.publicKey) {
@@ -128,14 +129,11 @@ export const useBreeding = () => {
   /** Fetch wallet token balance */
   useEffect(() => {
     const fetchBalance = async () => {
-      console.log("dfsdfsdfsd")
       try {
         const addr = await utils.token.associatedAddress({
           mint: breedingMachineAccount?.config.initializationFeeToken,
           owner: anchorWallet.publicKey,
         })
-
-        console.log(addr)
 
         const balance = await connection.getTokenAccountBalance(addr)
         setUserTokenBalance(balance.value.uiAmount.toLocaleString())
@@ -163,7 +161,8 @@ export const useBreeding = () => {
     const breedingMachine = findBreedingMachineAddress(
       candyMachineAddress,
       candyMachineAddress,
-      anchorWallet?.publicKey,
+      /** Authority pubkey */
+      breedingMachineAuthority,
       programId
     )
 
@@ -200,7 +199,8 @@ export const useBreeding = () => {
       const breedingMachine = findBreedingMachineAddress(
         candyMachineAddress,
         candyMachineAddress,
-        anchorWallet?.publicKey,
+        /** Authority pubkey */
+        breedingMachineAuthority,
         programId
       )
 
@@ -244,7 +244,8 @@ export const useBreeding = () => {
       const breedingMachine = findBreedingMachineAddress(
         candyMachineAddress,
         candyMachineAddress,
-        anchorWallet?.publicKey,
+        /** Authority pubkey */
+        breedingMachineAuthority,
         programId
       )
 
