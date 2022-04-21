@@ -7,13 +7,13 @@ const {
 } = require("@solana/spl-token")
 
 /**
- * Creates a new mint and mintTo a keypair
+ * Given a mint and a destination wallet, it mints 1 ** 9 tokens to the destination.
  */
 ;(async () => {
   const os = require("os")
 
   /**
-   * Keypair location
+   * Mint authority keypair
    */
   const pkString = (
     await readFile(os.homedir() + "/.config/solana/anchor.json")
@@ -29,18 +29,16 @@ const {
 
   const connection = new web3.Connection("http://127.0.0.1:8899", "confirmed")
 
-  console.log("Creating mint...")
-  const mint = await createMint(
-    connection,
-    keyPair,
-    keyPair.publicKey,
-    keyPair.publicKey,
-    9
-  )
+  const args = process.argv.slice(2)
+
+  const mint = new web3.PublicKey(args[0])
+  const destinationWallet = new web3.PublicKey(args[1])
+
+  console.log(destinationWallet.toString())
 
   const ataAddress = await utils.token.associatedAddress({
     mint,
-    owner: keyPair.publicKey,
+    owner: destinationWallet,
   })
 
   console.log("Fetching acc...")
@@ -52,12 +50,12 @@ const {
       connection,
       keyPair,
       mint,
-      keyPair.publicKey
+      destinationWallet
     )
   }
 
   console.log("Minting..")
-  const qty = 1000 ** 9
+  const qty = 1 ** 9
   await mintTo(connection, keyPair, mint, ataAddress, keyPair, qty)
 
   console.log(`Minted ${qty} ${mint} to ${keyPair.publicKey}!`)
