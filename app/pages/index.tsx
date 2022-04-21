@@ -22,8 +22,6 @@ export default function Home() {
     userTokenBalance,
   } = useBreeding()
 
-  console.log(breedingMachineAccount)
-  console.log(breedingMachineAccount?.config.initializationFeePrice.toNumber())
   const cost = breedingMachineAccount?.config.initializationFeePrice.toNumber()
 
   return (

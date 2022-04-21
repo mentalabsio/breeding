@@ -7,7 +7,11 @@ const {
 } = require("@solana/spl-token")
 
 /**
- * Given a mint and a destination wallet, it mints 1 ** 9 tokens to the destination.
+ * Given a mint and a destination wallet, it creates an ATA and mints 1 ** 9 tokens to the destination.
+ *
+ * Usage:
+ *
+ * node mint_to.js <mint_addr> <destination_wallet_addr>
  */
 ;(async () => {
   const os = require("os")
@@ -58,5 +62,5 @@ const {
   const qty = 1 ** 9
   await mintTo(connection, keyPair, mint, ataAddress, keyPair, qty)
 
-  console.log(`Minted ${qty} ${mint} to ${keyPair.publicKey}!`)
+  console.log(`Minted ${qty} ${mint} to ${destinationWallet}!`)
 })()

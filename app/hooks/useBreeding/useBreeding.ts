@@ -59,7 +59,8 @@ export const useBreeding = () => {
         const breedingMachine = findBreedingMachineAddress(
           candyMachineAddress,
           candyMachineAddress,
-          anchorWallet?.publicKey,
+          /** Authority pubkey */
+          new web3.PublicKey("7x4JZgW2oeAcra18oMC7Tudu9h6D5cYMJnjy8AbubBVW"),
           programId
         )
 

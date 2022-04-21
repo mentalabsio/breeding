@@ -8,6 +8,10 @@ const {
 
 /**
  * Creates a new mint and mintTo a keypair
+ *
+ * Usage:
+ *
+ * node create_spl_token.js
  */
 ;(async () => {
   const os = require("os")
