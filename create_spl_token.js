@@ -61,7 +61,7 @@ const {
   }
 
   console.log("Minting..")
-  const qty = 1000 ** 9
+  const qty = 100 ** 9
   await mintTo(connection, keyPair, mint, ataAddress, keyPair, qty)
 
   console.log(`Minted ${qty} ${mint} to ${keyPair.publicKey}!`)

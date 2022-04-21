@@ -1,10 +1,6 @@
 const { web3, utils } = require("@project-serum/anchor")
 const { readFile } = require("fs/promises")
-const {
-  createMint,
-  mintTo,
-  createAssociatedTokenAccount,
-} = require("@solana/spl-token")
+const { mintTo, createAssociatedTokenAccount } = require("@solana/spl-token")
 
 /**
  * Given a mint and a destination wallet, it creates an ATA and mints 1 ** 9 tokens to the destination.
@@ -59,7 +55,7 @@ const {
   }
 
   console.log("Minting..")
-  const qty = 1 ** 9
+  const qty = 10 ** 9
   await mintTo(connection, keyPair, mint, ataAddress, keyPair, qty)
 
   console.log(`Minted ${qty} ${mint} to ${destinationWallet}!`)
