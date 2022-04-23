@@ -8,15 +8,12 @@ import {
   findWhitelistTokenAddress,
 } from "../app/utils/breeding"
 import { BreedProgram } from "../target/types/breed_program"
-import idl from "../target/idl/breed_program.json"
 
 describe("breed-program", () => {
   // Configure the client to use the local cluster.
   anchor.setProvider(anchor.Provider.env())
 
   const program = anchor.workspace.BreedProgram as Program<BreedProgram>
-
-  console.log(program)
 
   const parentsCandyMachineAddress = new anchor.web3.PublicKey(
     "9bBjPXwFVzPSEA4BH2wFfDnzYTekQq6itf6JBNvzRW2C"

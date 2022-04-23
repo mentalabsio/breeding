@@ -10,7 +10,7 @@ breed_program = "CxHUJkC6JEnQ4ybEziaA32Mibe41WkLRpJ7Esz9iUW3e"
 url = "https://anchor.projectserum.com"
 
 [provider]
-cluster = "devnet"
+cluster = "localnet"
 wallet = "~/.config/solana/anchor.json"
 
 [scripts]
@@ -102,11 +102,11 @@ address = "4cJ8hMuocWqJ8gmiviHEduv5X9EmagFPk5Uba16b4Zvh"
 
 # nft 2 mint
 [[test.validator.clone]]
-address = "FbgRi6cUD581knBjtovPYajdRp8fEqVDgJLVhK3V8372"
+address = "9bBjPXwFVzPSEA4BH2wFfDnzYTekQq6itf6JBNvzRW2C"
 
 # nft 2 holder account
 [[test.validator.clone]]
-address = "Ax6gAkkBKWcKSRU2vitdPwiw6hFK3xL9wZ6GRCAuYPhA"
+address = "EuhcFYpMXoDUgTKNTmBEx3gtuaMpKgMTZ5ZBztbwL32Q"
 
 
 # nft 2 metadata

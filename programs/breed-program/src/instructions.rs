@@ -283,8 +283,7 @@ pub struct FinalizeBreeding<'info> {
     pub whitelist_vault: Box<Account<'info, TokenAccount>>,
 
     #[account(
-        init,
-        payer = user_wallet,
+        mut,
         associated_token::mint = whitelist_token,
         associated_token::authority = user_wallet
     )]
