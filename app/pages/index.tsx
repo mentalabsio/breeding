@@ -5,6 +5,7 @@ import { PlusSign } from "@/components/icons"
 import { LoadingIcon } from "@/components/icons/LoadingIcon"
 import NFTSelector from "@/components/NFTSelector/NFTSelector"
 import { useBreeding } from "@/hooks/useBreeding/useBreeding"
+import { useCandyMachine } from "@/hooks/useCandyMachine"
 import { web3, BN } from "@project-serum/anchor"
 import { useAnchorWallet } from "@solana/wallet-adapter-react"
 import { Button, Flex, Heading, Text } from "@theme-ui/components"
@@ -21,6 +22,7 @@ export default function Home() {
     feedbackStatus,
     userTokenBalance,
   } = useBreeding()
+  const { onMint } = useCandyMachine()
 
   const cost = breedingMachineAccount?.config.initializationFeePrice.toNumber()
   const feeToken =
@@ -187,6 +189,7 @@ export default function Home() {
             <Heading variant="heading2" mt="1.6rem">
               Your breeds
             </Heading>
+            <Button onClick={() => onMint()}>mint</Button>
             {userBreedDatas ? (
               userBreedDatas.length ? (
                 <Flex
