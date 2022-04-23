@@ -56,7 +56,7 @@ export default function Home() {
           <>
             <hr />
             <Text>Fee token: {feeToken}</Text>
-            <Text>Breeding duration: {breedingTime}</Text>
+            <Text>Breeding duration: {breedingTime} seconds</Text>
             <Text>
               Burn parents:{" "}
               {breedingMachineAccount?.config.burnParents ? "Yes" : "No"}

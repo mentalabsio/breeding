@@ -2,15 +2,15 @@
 seeds = false
 
 [programs.devnet]
-breed_program = "CikztTpnE9wiNzafzTCSzE4tXKFi5iHcGKzBhpNTiP7p"
+breed_program = "CxHUJkC6JEnQ4ybEziaA32Mibe41WkLRpJ7Esz9iUW3e"
 [programs.localnet]
-breed_program = "CikztTpnE9wiNzafzTCSzE4tXKFi5iHcGKzBhpNTiP7p"
+breed_program = "CxHUJkC6JEnQ4ybEziaA32Mibe41WkLRpJ7Esz9iUW3e"
 
 [registry]
 url = "https://anchor.projectserum.com"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "~/.config/solana/anchor.json"
 
 [scripts]

@@ -20,7 +20,7 @@ const {
    * Keypair location
    */
   const pkString = (
-    await readFile(os.homedir() + "/.config/solana/anchor.json")
+    await readFile(os.homedir() + "/.config/solana/viv.json")
   ).toString()
 
   const pkArray = pkString
@@ -31,7 +31,10 @@ const {
 
   const keyPair = web3.Keypair.fromSecretKey(new Uint8Array(pkArray))
 
-  const connection = new web3.Connection("http://127.0.0.1:8899", "confirmed")
+  const connection = new web3.Connection(
+    "https://psytrbhymqlkfrhudd.dev.genesysgo.net:8899/",
+    "confirmed"
+  )
 
   console.log("Creating mint...")
   const mint = await createMint(

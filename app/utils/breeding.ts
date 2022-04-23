@@ -8,7 +8,7 @@ import {
 import { AnchorWallet, WalletContextState } from "@solana/wallet-adapter-react"
 
 const programId = new web3.PublicKey(
-  "CikztTpnE9wiNzafzTCSzE4tXKFi5iHcGKzBhpNTiP7p"
+  "CxHUJkC6JEnQ4ybEziaA32Mibe41WkLRpJ7Esz9iUW3e"
 )
 
 const incineratorAddress = new web3.PublicKey(

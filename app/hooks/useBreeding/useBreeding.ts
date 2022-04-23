@@ -7,8 +7,12 @@ import {
 } from "@/utils/breeding"
 import { createBreeding } from "@/utils/breeding"
 
-const candyMachineAddress = new web3.PublicKey(
-  "2foGcTHZ2C9c5xQrBopgLyNxQ33rdSxwDXqHJbv34Fvs"
+const parentsCandyMachineAddress = new web3.PublicKey(
+  "9bBjPXwFVzPSEA4BH2wFfDnzYTekQq6itf6JBNvzRW2C"
+)
+
+const rewardsCandyMachineAddress = new web3.PublicKey(
+  "EuhcFYpMXoDUgTKNTmBEx3gtuaMpKgMTZ5ZBztbwL32Q"
 )
 
 const feeToken = new web3.PublicKey(
@@ -16,11 +20,11 @@ const feeToken = new web3.PublicKey(
 )
 
 const programId = new web3.PublicKey(
-  "CikztTpnE9wiNzafzTCSzE4tXKFi5iHcGKzBhpNTiP7p"
+  "CxHUJkC6JEnQ4ybEziaA32Mibe41WkLRpJ7Esz9iUW3e"
 )
 
 const breedingMachineAuthority = new web3.PublicKey(
-  "7x4JZgW2oeAcra18oMC7Tudu9h6D5cYMJnjy8AbubBVW"
+  "ViVDtpVYKdhRRH9FTKsh6reJB9xXUqpX1233BSDZWRQ"
 )
 
 export const useBreeding = () => {
@@ -61,12 +65,19 @@ export const useBreeding = () => {
         setFeedbackStatus("Fething breeding machine...")
 
         const breedingMachine = findBreedingMachineAddress(
-          candyMachineAddress,
-          candyMachineAddress,
+          parentsCandyMachineAddress,
+          rewardsCandyMachineAddress,
           /** Authority pubkey */
           breedingMachineAuthority,
           programId
         )
+
+        const whitelistToken = findWhitelistTokenAddress(
+          breedingMachine,
+          programId
+        )
+
+        console.log(whitelistToken.toString())
 
         const machineAccount = await anchorProgram.account.breedMachine.fetch(
           breedingMachine
@@ -154,13 +165,13 @@ export const useBreeding = () => {
       rewardSupply: new BN(3333),
       initializationFeeToken: feeToken,
       initializationFeePrice: new BN(1),
-      rewardCandyMachine: candyMachineAddress,
-      parentsCandyMachine: candyMachineAddress,
+      rewardCandyMachine: rewardsCandyMachineAddress,
+      parentsCandyMachine: parentsCandyMachineAddress,
     }
 
     const breedingMachine = findBreedingMachineAddress(
-      candyMachineAddress,
-      candyMachineAddress,
+      parentsCandyMachineAddress,
+      rewardsCandyMachineAddress,
       /** Authority pubkey */
       breedingMachineAuthority,
       programId
@@ -197,8 +208,8 @@ export const useBreeding = () => {
         throw new Error("Mint addresses are missing.")
 
       const breedingMachine = findBreedingMachineAddress(
-        candyMachineAddress,
-        candyMachineAddress,
+        parentsCandyMachineAddress,
+        rewardsCandyMachineAddress,
         /** Authority pubkey */
         breedingMachineAuthority,
         programId
@@ -242,8 +253,8 @@ export const useBreeding = () => {
         throw new Error("Mint addresses are missing.")
 
       const breedingMachine = findBreedingMachineAddress(
-        candyMachineAddress,
-        candyMachineAddress,
+        parentsCandyMachineAddress,
+        rewardsCandyMachineAddress,
         /** Authority pubkey */
         breedingMachineAuthority,
         programId
