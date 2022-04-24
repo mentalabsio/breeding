@@ -1,6 +1,6 @@
 import * as anchor from "@project-serum/anchor"
 
-import { MintLayout, TOKEN_PROGRAM_ID, Token } from "@solana/spl-token"
+import { MintLayout, Token, TOKEN_PROGRAM_ID } from "@solana/spl-token"
 import { AnchorWallet } from "@solana/wallet-adapter-react"
 import {
   SystemProgram,
