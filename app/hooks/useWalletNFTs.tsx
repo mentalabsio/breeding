@@ -19,13 +19,16 @@ export type NFT = {
     properties: {
       files: Array<string>
       category: string
-      creators: Array<string>
+      creators: Array<{
+        pubKey: string
+        address: string
+      }>
     }
     seller_fee_basis_points: number
   }
 }
 
-const useWalletNFTs = () => {
+const useWalletNFTs = (creators: string[]) => {
   const { connection } = useConnection()
   const { publicKey } = useWallet()
   const [walletNFTs, setWalletNFTs] = useState<Array<NFT>>([])
@@ -33,7 +36,16 @@ const useWalletNFTs = () => {
   useEffect(() => {
     const fetchNFTs = async () => {
       const NFTs = await getNFTsByOwner(publicKey, connection)
-      setWalletNFTs(NFTs)
+
+      const filtered = NFTs.filter((NFT) => {
+        const obj = NFT.onchainMetadata.data.creators.find((value) => {
+          return creators.indexOf(value.address) !== -1
+        })
+
+        return obj
+      })
+
+      setWalletNFTs(filtered)
     }
 
     if (publicKey) {
