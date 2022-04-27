@@ -16,7 +16,6 @@ export default function Home() {
   const {
     initializeBreeding,
     terminateBreeding,
-    initializeBreedingMachine,
     breedingMachineAccount,
     userBreedDatas,
     feedbackStatus,
@@ -29,6 +28,15 @@ export default function Home() {
     breedingMachineAccount?.config.initializationFeeToken.toString()
   const breedingTime = breedingMachineAccount?.config.breedingTime.toNumber()
 
+  const configInfo = breedingMachineAccount && {
+    feeToken,
+    breedingTime,
+    burnParents: breedingMachineAccount?.config.burnParents,
+    bred: breedingMachineAccount.bred.toNumber(),
+    born: breedingMachineAccount.born.toNumber(),
+  }
+
+  console.log(configInfo)
   return (
     <>
       <Head>
@@ -54,9 +62,10 @@ export default function Home() {
         {/* 
         <Button onClick={initializeBreedingMachine}>initialize</Button> */}
 
-        {breedingMachineAccount && (
+        {/* {breedingMachineAccount && (
           <>
             <hr />
+            {}
             <Text>Fee token: {feeToken}</Text>
             <Text>Breeding duration: {breedingTime} seconds</Text>
             <Text>
@@ -69,7 +78,7 @@ export default function Home() {
             </Text>
             <Text>Total born: {breedingMachineAccount.born.toNumber()}</Text>
           </>
-        )}
+        )} */}
 
         <Flex
           sx={{
@@ -168,7 +177,8 @@ export default function Home() {
                 }}
               >
                 <Text>
-                  {cost && "Cost: " + cost} | Balance: {userTokenBalance || "0"}
+                  {cost && "Cost: " + cost} | Your Balance:{" "}
+                  {userTokenBalance || "0"}
                 </Text>
                 <Button
                   sx={{
@@ -273,12 +283,12 @@ export default function Home() {
       <footer
         sx={{
           display: "flex",
-          flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          marginTop: "4rem",
+          margin: "4rem 0",
         }}
       >
+        Powered by{" "}
         <a
           href="https://twitter.com/magicshards"
           target="_blank"
@@ -288,7 +298,6 @@ export default function Home() {
             alignItems: "center",
           }}
         >
-          Powered by{" "}
           <Text
             variant="small"
             sx={{
@@ -300,7 +309,7 @@ export default function Home() {
               sx={{
                 height: "32px",
               }}
-              src="/magicshards.png"
+              src="/magicshards320px.gif"
               alt="Magic Shards"
               height={32}
             />
