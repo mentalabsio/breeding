@@ -26,24 +26,26 @@ export default function Home() {
 
   /** Just log some info */
   useEffect(() => {
-    const feeToken =
-      breedingMachineAccount?.config.initializationFeeToken.toString()
-    const breedingTime = breedingMachineAccount?.config.breedingTime.toNumber()
+    if (breedingMachineAccount) {
+      const feeToken =
+        breedingMachineAccount?.config.initializationFeeToken.toString()
+      const breedingTime =
+        breedingMachineAccount?.config.breedingTime.toNumber()
 
-    const configInfo = breedingMachineAccount && {
-      feeToken,
-      breedingTime,
-      burnParents: breedingMachineAccount?.config.burnParents,
-      bred: breedingMachineAccount.bred.toNumber(),
-      born: breedingMachineAccount.born.toNumber(),
+      const configInfo = breedingMachineAccount && {
+        feeToken,
+        breedingTime,
+        burnParents: breedingMachineAccount?.config.burnParents,
+        bred: breedingMachineAccount.bred.toNumber(),
+        born: breedingMachineAccount.born.toNumber(),
+      }
+
+      console.log(configInfo)
     }
-
-    console.log(configInfo)
   }, [breedingMachineAccount])
 
   const cost = breedingMachineAccount?.config.initializationFeePrice.toNumber()
 
-  console.log(userBreedDatas)
   return (
     <>
       <Head>

@@ -87,13 +87,11 @@ export const useCandyMachine = () => {
 
     if (candyMachineId) {
       try {
-        console.log("fsdfgsd")
         const cndy = await getCandyMachineState(
           anchorWallet,
           candyMachineId,
           connection
         )
-        console.log("cndy")
 
         let active =
           cndy?.state.goLiveDate?.toNumber() < new Date().getTime() / 1000
@@ -188,7 +186,6 @@ export const useCandyMachine = () => {
           (cndy?.state.gatekeeper ? 33 : 0) +
           (cndy?.state.gatekeeper?.expireOnUse ? 66 : 0)
 
-        console.log(txnEstimate)
         setNeedTxnSplit(txnEstimate > 1230)
       } catch (e) {
         if (e instanceof Error) {

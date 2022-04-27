@@ -25,9 +25,7 @@ export async function getNFTMetadata(
       onchainMetadata,
       externalMetadata,
     }
-  } catch (e) {
-    console.log(`failed to pull metadata for token ${mint}`)
-  }
+  } catch (e) {}
 }
 
 export async function getNFTMetadataForMany(
