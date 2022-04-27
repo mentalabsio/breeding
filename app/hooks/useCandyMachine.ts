@@ -357,5 +357,6 @@ export const useCandyMachine = () => {
 
   return {
     onMint,
+    alertState,
   }
 }

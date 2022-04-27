@@ -22,7 +22,7 @@ export default function Home() {
     feedbackStatus,
     userTokenBalance,
   } = useBreeding()
-  const { onMint } = useCandyMachine()
+  const { alertState, onMint } = useCandyMachine()
 
   const cost = breedingMachineAccount?.config.initializationFeePrice.toNumber()
   const feeToken =
@@ -142,9 +142,9 @@ export default function Home() {
                   flexDirection: "column",
                   alignItems: "center",
 
-                  // "@media (min-width: 768px)": {
-                  //   flexDirection: "row",
-                  // },
+                  "@media (min-width: 768px)": {
+                    flexDirection: "row",
+                  },
                 }}
               >
                 <NFTSelector name="mint" />
@@ -189,7 +189,29 @@ export default function Home() {
             <Heading variant="heading2" mt="1.6rem">
               Your breeds
             </Heading>
-            <Button onClick={() => onMint()}>mint</Button>
+            <Flex
+              sx={{
+                alignItems: "center",
+                gap: ".8rem",
+                margin: "1.6rem 0",
+              }}
+            >
+              {alertState.message && (
+                <>
+                  {alertState.severity !== "success" && <LoadingIcon />}
+
+                  <Text
+                    sx={{
+                      color:
+                        alertState.severity === "success" ? "success" : "text",
+                    }}
+                  >
+                    {alertState.message}
+                  </Text>
+                </>
+              )}{" "}
+              &nbsp;
+            </Flex>
             {userBreedDatas ? (
               userBreedDatas.length ? (
                 <Flex
@@ -218,9 +240,14 @@ export default function Home() {
                         {breedData.mintB.toString().slice(0, 6) + "..."}
                         <Button
                           variant="secondary"
-                          onClick={() =>
-                            terminateBreeding(breedData.mintA, breedData.mintB)
-                          }
+                          onClick={async () => {
+                            await terminateBreeding(
+                              breedData.mintA,
+                              breedData.mintB
+                            )
+
+                            await onMint()
+                          }}
                         >
                           Terminate
                         </Button>

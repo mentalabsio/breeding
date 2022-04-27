@@ -49,11 +49,12 @@ const NFTSelector = ({ name }: { name: string }) => {
     control: (styles) => ({
       ...styles,
       backgroundColor: theme?.colors.background.toString(),
+      minHeight: "6.4rem",
     }),
 
     container: (styles) => ({
       ...styles,
-      minWidth: "32rem",
+      minWidth: "22.4rem",
     }),
 
     menu: (styles) => ({
@@ -90,6 +91,18 @@ const NFTSelector = ({ name }: { name: string }) => {
     }),
   }
 
-  return <Select name={name} options={options} styles={colourStyles} />
+  return (
+    <Select
+      name={name}
+      options={options}
+      styles={colourStyles}
+      placeholder={
+        <SelectorNFTOptionLabel
+          name="Select an NFT"
+          imgSrc="https://via.placeholder.com/480x480"
+        />
+      }
+    />
+  )
 }
 export default NFTSelector
