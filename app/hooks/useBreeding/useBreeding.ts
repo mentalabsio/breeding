@@ -6,6 +6,8 @@ import {
   findWhitelistTokenAddress,
 } from "@/utils/breeding"
 import { createBreeding } from "@/utils/breeding"
+import { getNFTMetadata } from "@/utils/nfts"
+import { metadata } from "@metaplex/js/lib/utils"
 
 const parentsCandyMachineAddress = new web3.PublicKey(
   "9bBjPXwFVzPSEA4BH2wFfDnzYTekQq6itf6JBNvzRW2C"
@@ -114,6 +116,7 @@ export const useBreeding = () => {
           if (
             breedData.owner.toString() === anchorWallet.publicKey.toString()
           ) {
+            console.log(acc.pubkey.toString())
             return breedData
           }
 
@@ -128,7 +131,20 @@ export const useBreeding = () => {
         (value) => value !== null
       )
 
-      setUserBreedDatas(breedDatas)
+      const withNFTs = breedDatas.map(async (breedData) => {
+        const metadatas = await Promise.all([
+          getNFTMetadata(breedData.mintA, connection),
+          getNFTMetadata(breedData.mintB, connection),
+        ])
+
+        return { breedData, metadatas }
+      })
+
+      const breedDatasWithNFTs = (await Promise.all(withNFTs)).filter(
+        (value) => value !== null
+      )
+
+      setUserBreedDatas(breedDatasWithNFTs)
       setFeedbackStatus("")
     }
 

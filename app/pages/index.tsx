@@ -7,9 +7,10 @@ import NFTSelector from "@/components/NFTSelector/NFTSelector"
 import { useBreeding } from "@/hooks/useBreeding/useBreeding"
 import { useCandyMachine } from "@/hooks/useCandyMachine"
 import { web3, BN } from "@project-serum/anchor"
-import { useAnchorWallet } from "@solana/wallet-adapter-react"
+import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react"
 import { Button, Flex, Heading, Text } from "@theme-ui/components"
 import Head from "next/head"
+import { useEffect } from "react"
 
 export default function Home() {
   const anchorWallet = useAnchorWallet()
@@ -23,20 +24,26 @@ export default function Home() {
   } = useBreeding()
   const { alertState, onMint } = useCandyMachine()
 
+  /** Just log some info */
+  useEffect(() => {
+    const feeToken =
+      breedingMachineAccount?.config.initializationFeeToken.toString()
+    const breedingTime = breedingMachineAccount?.config.breedingTime.toNumber()
+
+    const configInfo = breedingMachineAccount && {
+      feeToken,
+      breedingTime,
+      burnParents: breedingMachineAccount?.config.burnParents,
+      bred: breedingMachineAccount.bred.toNumber(),
+      born: breedingMachineAccount.born.toNumber(),
+    }
+
+    console.log(configInfo)
+  }, [breedingMachineAccount])
+
   const cost = breedingMachineAccount?.config.initializationFeePrice.toNumber()
-  const feeToken =
-    breedingMachineAccount?.config.initializationFeeToken.toString()
-  const breedingTime = breedingMachineAccount?.config.breedingTime.toNumber()
 
-  const configInfo = breedingMachineAccount && {
-    feeToken,
-    breedingTime,
-    burnParents: breedingMachineAccount?.config.burnParents,
-    bred: breedingMachineAccount.bred.toNumber(),
-    born: breedingMachineAccount.born.toNumber(),
-  }
-
-  console.log(configInfo)
+  console.log(userBreedDatas)
   return (
     <>
       <Head>
@@ -191,12 +198,7 @@ export default function Home() {
               </Flex>
             </form>
 
-            <hr
-              sx={{
-                marginTop: "1.6rem",
-              }}
-            />
-            <Heading variant="heading2" mt="1.6rem">
+            <Heading variant="heading1" mt="4.8rem">
               Your breeds
             </Heading>
             <Flex
@@ -230,45 +232,88 @@ export default function Home() {
                     alignItems: "center",
                   }}
                 >
-                  {userBreedDatas.map((breedData) => (
-                    <Flex
-                      key={breedData.timestamp}
-                      sx={{
-                        flexDirection: "column",
-                        margin: "1.6rem 0",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
+                  {userBreedDatas.map((breedData) => {
+                    return (
                       <Flex
+                        key={breedData.breedData.timestamp}
                         sx={{
+                          flexDirection: "column",
+                          margin: "1.6rem 0",
                           alignItems: "center",
-                          gap: ".8rem",
+                          justifyContent: "center",
                         }}
                       >
-                        {breedData.mintA.toString().slice(0, 6) + "..."} +{" "}
-                        {breedData.mintB.toString().slice(0, 6) + "..."}
-                        <Button
-                          variant="secondary"
-                          onClick={async () => {
-                            await terminateBreeding(
-                              breedData.mintA,
-                              breedData.mintB
-                            )
-
-                            await onMint()
+                        <Flex
+                          sx={{
+                            alignItems: "center",
+                            gap: ".8rem",
                           }}
                         >
-                          Terminate
-                        </Button>
+                          <Flex
+                            sx={{
+                              alignItems: "center",
+                              gap: "1.6rem",
+                            }}
+                          >
+                            <img
+                              src={
+                                breedData.metadatas[0].externalMetadata.image
+                              }
+                              sx={{
+                                maxHeight: "3.2rem",
+                              }}
+                            />
+                            {breedData.metadatas[0].externalMetadata.name}
+                          </Flex>
+                          <PlusSign
+                            sx={{
+                              width: "1.6rem",
+                              height: "1.6rem",
+                              stroke: "text",
+                              strokeWidth: ".2rem",
+                            }}
+                          />
+                          <Flex
+                            sx={{
+                              alignItems: "center",
+                              gap: "1.6rem",
+                            }}
+                          >
+                            <img
+                              src={
+                                breedData.metadatas[1].externalMetadata.image
+                              }
+                              sx={{
+                                maxHeight: "3.2rem",
+                              }}
+                            />
+                            {breedData.metadatas[1].externalMetadata.name}
+                          </Flex>
+                          <Button
+                            sx={{
+                              marginLeft: "1.6rem",
+                            }}
+                            variant="secondary"
+                            onClick={async () => {
+                              await terminateBreeding(
+                                breedData.breedData.mintA,
+                                breedData.breedData.mintB
+                              )
+
+                              await onMint()
+                            }}
+                          >
+                            Terminate
+                          </Button>
+                        </Flex>
+                        {/* <Flex>
+                          {new Date(
+                            breedData.breedData.timestamp.toNumber() * 1000
+                          ).toLocaleString()}
+                        </Flex> */}
                       </Flex>
-                      <Flex>
-                        {new Date(
-                          breedData.timestamp.toNumber() * 1000
-                        ).toLocaleString()}
-                      </Flex>
-                    </Flex>
-                  ))}
+                    )
+                  })}
                 </Flex>
               ) : (
                 <Text>Empty.</Text>
