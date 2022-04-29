@@ -45,6 +45,21 @@ pub mod breed_program {
         Ok(())
     }
 
+    pub fn update_machine_config(
+        ctx: Context<UpdateMachineConfig>,
+        args: UpdateMachineConfigArgs,
+    ) -> Result<()> {
+        let config = &mut ctx.accounts.breeding_machine.config;
+
+        config.breeding_time = args.breeding_time.unwrap_or(config.breeding_time);
+        config.initialization_fee_price = args
+            .initialization_fee_price
+            .unwrap_or(config.initialization_fee_price);
+        config.burn_parents = args.burn_parents.unwrap_or(config.burn_parents);
+
+        Ok(())
+    }
+
     #[access_control(
         charge::token_fee(&ctx, ctx.accounts.breeding_machine.config.initialization_fee_price)
     )]

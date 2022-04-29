@@ -71,6 +71,21 @@ impl<'info> InitializeBreedMachine<'info> {
     }
 }
 
+#[derive(Debug, Clone, AnchorSerialize, AnchorDeserialize)]
+pub struct UpdateMachineConfigArgs {
+    pub breeding_time: Option<u64>,
+    pub burn_parents: Option<bool>,
+    pub initialization_fee_price: Option<u64>,
+}
+
+#[derive(Accounts)]
+pub struct UpdateMachineConfig<'info> {
+    #[account(mut, has_one = authority)]
+    pub breeding_machine: Account<'info, BreedMachine>,
+
+    pub authority: Signer<'info>,
+}
+
 #[derive(Accounts, Chargeable)]
 pub struct InitializeBreed<'info> {
     #[account(

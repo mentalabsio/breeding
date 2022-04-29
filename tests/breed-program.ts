@@ -112,6 +112,33 @@ describe("breed-program", () => {
     expect(machineAccount.bred.toNumber()).to.equal(0)
   })
 
+  it("should be able to update a machine's config", async () => {
+    const newPrice = new anchor.BN(1234)
+
+    const tx = await program.methods
+      .updateMachineConfig({
+        initializationFeePrice: newPrice,
+        breedingTime: new anchor.BN(1),
+        burnParents: false,
+      })
+      .accounts({
+        breedingMachine,
+        authority: authority.publicKey,
+      })
+      .signers([authority])
+      .rpc()
+
+    console.log("Your transaction signature:", tx)
+
+    const machineAccount = await program.account.breedMachine.fetch(
+      breedingMachine
+    )
+
+    expect(machineAccount.config.initializationFeePrice.toNumber()).to.equal(
+      1234
+    )
+  })
+
   it("should be able to initialize a breeding", async () => {
     const {
       tx,
