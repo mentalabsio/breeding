@@ -29,7 +29,7 @@ const SelectorNFTOptionLabel = ({
   )
 }
 
-const NFTSelector = ({ name }: { name: string }) => {
+const NFTSelectInput = ({ name }: { name: string }) => {
   const { theme } = useThemeUI()
   const { walletNFTs } = useWalletNFTs([
     "9bBjPXwFVzPSEA4BH2wFfDnzYTekQq6itf6JBNvzRW2C",
@@ -105,4 +105,4 @@ const NFTSelector = ({ name }: { name: string }) => {
     />
   )
 }
-export default NFTSelector
+export default NFTSelectInput

@@ -3,7 +3,7 @@
 import Header from "@/components/Header/Header"
 import { PlusSign } from "@/components/icons"
 import { LoadingIcon } from "@/components/icons/LoadingIcon"
-import NFTSelector from "@/components/NFTSelector/NFTSelector"
+import NFTSelectInput from "@/components/NFTSelectInput/NFTSelectInput"
 import { useBreeding } from "@/hooks/useBreeding/useBreeding"
 import { web3 } from "@project-serum/anchor"
 import { useAnchorWallet } from "@solana/wallet-adapter-react"
@@ -164,7 +164,7 @@ export default function Home() {
                   },
                 }}
               >
-                <NFTSelector name="mint" />
+                <NFTSelectInput name="mint" />
 
                 <PlusSign
                   sx={{
@@ -175,7 +175,7 @@ export default function Home() {
                   }}
                 />
 
-                <NFTSelector name="mint" />
+                <NFTSelectInput name="mint" />
               </Flex>
               <Flex
                 sx={{
