@@ -398,7 +398,7 @@ export default function Home() {
               )}
             </Flex> */}
 
-            <Text
+            {/* <Text
               variant="small"
               sx={{
                 display: "flex",
@@ -412,7 +412,7 @@ export default function Home() {
                 click here
               </Button>{" "}
               <Text variant="xsmall">to mint manually</Text>
-            </Text>
+            </Text> */}
           </Flex>
         </Flex>
       </main>
