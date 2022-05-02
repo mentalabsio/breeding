@@ -44,7 +44,7 @@ export const useBreeding = () => {
    * Fetch IDL, breeding machine and breed datas on mount
    */
   const fetchData = useCallback(async () => {
-    console.log("[useBreeding] Fetching data...")
+    console.log("[useBreeding] Fetching breeding machine and breed datas...")
     setFeedbackStatus("Fetching program...")
     const provider = new Provider(connection, anchorWallet, {
       preflightCommitment: "recent",
@@ -100,7 +100,7 @@ export const useBreeding = () => {
       console.error("Couldn't fetch breeding machine!" + e)
     }
 
-    setFeedbackStatus("Fetching breeds...")
+    setFeedbackStatus("Fetching user breedings...")
     /** Fetch all program accounts */
     const programAccs = await connection.getProgramAccounts(programId)
 

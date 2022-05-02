@@ -1,6 +1,6 @@
 /** @jsxImportSource theme-ui */
 
-import useWalletNFTs from "@/hooks/useWalletNFTs"
+import useWalletNFTs, { NFT } from "@/hooks/useWalletNFTs"
 import Select, { StylesConfig } from "react-select"
 import { useThemeUI, Flex } from "theme-ui"
 
@@ -29,13 +29,10 @@ const SelectorNFTOptionLabel = ({
   )
 }
 
-const NFTSelectInput = ({ name }: { name: string }) => {
+const NFTSelectInput = ({ name, NFTs }: { name: string; NFTs: NFT[] }) => {
   const { theme } = useThemeUI()
-  const { walletNFTs } = useWalletNFTs([
-    "9bBjPXwFVzPSEA4BH2wFfDnzYTekQq6itf6JBNvzRW2C",
-  ])
 
-  const options = walletNFTs.map((NFT) => ({
+  const options = NFTs.map((NFT) => ({
     value: NFT.mint,
     label: (
       <SelectorNFTOptionLabel

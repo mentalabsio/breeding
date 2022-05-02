@@ -35,6 +35,7 @@ const useWalletNFTs = (creators: string[]) => {
 
   useEffect(() => {
     const fetchNFTs = async () => {
+      console.log("[useWalletNFTs] Fetching NFTs...")
       const NFTs = await getNFTsByOwner(publicKey, connection)
 
       const filtered = NFTs.filter((NFT) => {

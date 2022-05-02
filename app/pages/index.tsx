@@ -5,6 +5,7 @@ import { PlusSign } from "@/components/icons"
 import { LoadingIcon } from "@/components/icons/LoadingIcon"
 import NFTSelectInput from "@/components/NFTSelectInput/NFTSelectInput"
 import { useBreeding } from "@/hooks/useBreeding/useBreeding"
+import useWalletNFTs from "@/hooks/useWalletNFTs"
 import { web3 } from "@project-serum/anchor"
 import { useAnchorWallet } from "@solana/wallet-adapter-react"
 import { Button, Flex, Heading, Text } from "@theme-ui/components"
@@ -13,6 +14,9 @@ import { useEffect } from "react"
 
 export default function Home() {
   const anchorWallet = useAnchorWallet()
+  const { walletNFTs } = useWalletNFTs([
+    "9bBjPXwFVzPSEA4BH2wFfDnzYTekQq6itf6JBNvzRW2C",
+  ])
   const {
     initializeBreeding,
     terminateBreeding,
@@ -164,7 +168,7 @@ export default function Home() {
                   },
                 }}
               >
-                <NFTSelectInput name="mint" />
+                <NFTSelectInput name="mint" NFTs={walletNFTs} />
 
                 <PlusSign
                   sx={{
@@ -175,7 +179,7 @@ export default function Home() {
                   }}
                 />
 
-                <NFTSelectInput name="mint" />
+                <NFTSelectInput name="mint" NFTs={walletNFTs} />
               </Flex>
               <Flex
                 sx={{
