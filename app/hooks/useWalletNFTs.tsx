@@ -38,7 +38,7 @@ const useWalletNFTs = (creators: string[]) => {
     const NFTs = await getNFTsByOwner(publicKey, connection)
 
     const filtered = NFTs.filter((NFT) => {
-      const obj = NFT.onchainMetadata.data.creators.find((value) => {
+      const obj = NFT.onchainMetadata?.data?.creators?.find((value) => {
         return creators.indexOf(value.address) !== -1
       })
 
