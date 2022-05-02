@@ -67,7 +67,7 @@ export default function Home() {
         }}
       >
         <Heading mb=".8rem" variant="heading1">
-          Breed
+          Breeding
         </Heading>
         <Text>Generate a new NFT from two!</Text>
 
@@ -97,6 +97,7 @@ export default function Home() {
             alignItems: "center",
             gap: ".8rem",
             margin: "1.6rem 0",
+            minHeight: "2.4rem",
           }}
         >
           {feedbackStatus && (
@@ -129,7 +130,7 @@ export default function Home() {
               alignItems: "center",
             }}
           >
-            <Heading variant="heading3">Select two NFTs:</Heading>
+            <Heading variant="heading2">Select two NFTs to breed:</Heading>
 
             <form
               onSubmit={async (e) => {
@@ -207,8 +208,8 @@ export default function Home() {
               </Flex>
             </form>
 
-            <Heading variant="heading1" mt="4.8rem" mb=".8rem">
-              Your breedings
+            <Heading variant="heading2" mt="4.8rem" mb=".8rem">
+              Your current breedings
             </Heading>
             {/* <Flex
               sx={{
@@ -233,15 +234,16 @@ export default function Home() {
               )}{" "}
               &nbsp;
             </Flex> */}
-            {userBreedDatas ? (
-              userBreedDatas.length ? (
-                <Flex
-                  sx={{
-                    flexDirection: "column",
-                    alignItems: "center",
-                  }}
-                >
-                  {userBreedDatas.map((breedData) => {
+            <Flex
+              sx={{
+                flexDirection: "column",
+                alignItems: "center",
+                minHeight: "2.4rem",
+              }}
+            >
+              {userBreedDatas ? (
+                userBreedDatas.length ? (
+                  userBreedDatas.map((breedData) => {
                     return (
                       <Flex
                         key={breedData.breedData.timestamp}
@@ -314,22 +316,22 @@ export default function Home() {
                           </Button>
                         </Flex>
                         {/* <Flex>
-                          {new Date(
-                            breedData.breedData.timestamp.toNumber() * 1000
-                          ).toLocaleString()}
-                        </Flex> */}
+                      {new Date(
+                        breedData.breedData.timestamp.toNumber() * 1000
+                      ).toLocaleString()}
+                    </Flex> */}
                       </Flex>
                     )
-                  })}
-                </Flex>
+                  })
+                ) : (
+                  <Text>Empty.</Text>
+                )
+              ) : anchorWallet?.publicKey ? (
+                <LoadingIcon />
               ) : (
-                <Text>Empty.</Text>
-              )
-            ) : anchorWallet?.publicKey ? (
-              <LoadingIcon />
-            ) : (
-              "Connect your wallet first."
-            )}
+                <Text>Connect your wallet first.</Text>
+              )}
+            </Flex>
           </Flex>
         </Flex>
       </main>
