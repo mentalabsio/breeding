@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use solutils::charge;
 
-declare_id!("CxHUJkC6JEnQ4ybEziaA32Mibe41WkLRpJ7Esz9iUW3e");
+declare_id!("GD3hCzdGedt7MQLKCcMebGQ1suNHdZedL24KjYyH7wTG");
 
 pub mod instructions;
 

@@ -21,7 +21,7 @@ const feeToken = new web3.PublicKey(
 )
 
 const programId = new web3.PublicKey(
-  "CxHUJkC6JEnQ4ybEziaA32Mibe41WkLRpJ7Esz9iUW3e"
+  "GD3hCzdGedt7MQLKCcMebGQ1suNHdZedL24KjYyH7wTG"
 )
 
 const breedingMachineAuthority = new web3.PublicKey(

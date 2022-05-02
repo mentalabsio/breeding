@@ -2,16 +2,16 @@
 seeds = false
 
 [programs.devnet]
-breed_program = "CxHUJkC6JEnQ4ybEziaA32Mibe41WkLRpJ7Esz9iUW3e"
+breed_program = "GD3hCzdGedt7MQLKCcMebGQ1suNHdZedL24KjYyH7wTG"
 [programs.localnet]
-breed_program = "CxHUJkC6JEnQ4ybEziaA32Mibe41WkLRpJ7Esz9iUW3e"
+breed_program = "GD3hCzdGedt7MQLKCcMebGQ1suNHdZedL24KjYyH7wTG"
 
 [registry]
 url = "https://anchor.projectserum.com"
 
 [provider]
 cluster = "https://psytrbhymqlkfrhudd.dev.genesysgo.net:8899/"
-wallet = "~/.config/solana/anchor.json"
+wallet = "~/.config/solana/viv.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
@@ -22,95 +22,33 @@ startup_wait = 20000
 [test.validator]
 url = "https://api.devnet.solana.com"
 
-# Authority
+# User wallet address
 [[test.validator.clone]]
-address = "7CY9dKWDQimK43RkGXyT7BUpgvUGduSbCRt4RNpv2L8w"
+address = "ViVDtpVYKdhRRH9FTKsh6reJB9xXUqpX1233BSDZWRQ"
 
-# User address
+# NFT Mint A for test
 [[test.validator.clone]]
-address = "9BeNtJPhQfV7iRGvgNGMC7Q8hBaiESE5YKQaHQTeiWRr"
-# Mint A
+address = "Fdv4nCDfm2835Xe9FJNdNsTTTzkb34HV2a3s4L2HzdPX"
+
+# NFT Mint B for test
 [[test.validator.clone]]
-address = "4kZVPqN3b2CFUniF8bBdex32ziQ3FxbxhNYT3teV7Jkx"
-# Mint A metadata
-[[test.validator.clone]]
-address = "5e22jre9DQYKUZctASDaskucmahgmJJ8JtkubpYDZiqX"
-# User Mint A ATA
-[[test.validator.clone]]
-address = "Dip3H8tgZGnHqPSkMXiWrX2i64ZQRed63CaBo3FBKF4M"
-# Mint B
-[[test.validator.clone]]
-address = "2Z8esbcvecdEDXp6Py3HW3th9CAUJtTW5Df3Lz1m6qJC"
-# Mint B metadata
-[[test.validator.clone]]
-address = "6mdz34FCJ3tHhmwcwTpreT9D3ULeDgDAnSoTKNrBJvxm"
-# User Mint B ATA
-[[test.validator.clone]]
-address = "CdpebUieyDUgU6AEyk3dpzN7GGPdueoNMR6nYa5Eqtaf"
-# Fee token address
-[[test.validator.clone]]
-address = "NEpinL3xGXUpDeLdiJmVAoMGHXVF6BjsPHV6HRtNZDh"
-# User fee token ATA
-[[test.validator.clone]]
-address = "5qqv2Zs8AjEesRTwV8E2oMsoMjzkCEFu8mr9nN2dCZ6m"
+address = "vjhUBzNoKN9cWnf8SRojvX3X5QzZqAJD8JDb6fZKEfP"
 
 # Token program
 [[test.validator.clone]]
 address = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+
 # Associated token program
 [[test.validator.clone]]
 address = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+
 # Token metadata program
 [[test.validator.clone]]
 address = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
 
 
 
-
-# NFTs
-
-# holder wallet
+# program idl for address GD3hCzdGedt7MQLKCcMebGQ1suNHdZedL24KjYyH7wTG
 [[test.validator.clone]]
-address = "ViVDtpVYKdhRRH9FTKsh6reJB9xXUqpX1233BSDZWRQ"
-
-# program idl
-[[test.validator.clone]]
-address = "DTddp5dRUfTYrrPjkdSxZqg1TkyEprbYhJpmNpLd8tSf"
-
-# ViV wallet feeToken
-[[test.validator.clone]]
-address = "6N4FqZM23cyWCNN3AcUFF9CpRuY1SYMqMRbfHTtB83M1"
-
-# ViV wallet feeToken ATA
-[[test.validator.clone]]
-address = "DmiTsvSV7aFGEmSRMYs9V857wfKmoxE9wpffz7Fi4WCc"
-
-# nft mint
-[[test.validator.clone]]
-address = "41jKeBpGH6Ur46r9fMc8JjyAbXitTB5BAdo7SGF82RoY"
-
-# nft holder account
-[[test.validator.clone]]
-address = "7U1G1DJAm51evMyN6RM7SyRAkrfGEC7B2CBc4CYnQthE"
-
-
-# nft metadata
-[[test.validator.clone]]
-address = "4cJ8hMuocWqJ8gmiviHEduv5X9EmagFPk5Uba16b4Zvh"
-
-
-
-# nft 2 mint
-[[test.validator.clone]]
-address = "9bBjPXwFVzPSEA4BH2wFfDnzYTekQq6itf6JBNvzRW2C"
-
-# nft 2 holder account
-[[test.validator.clone]]
-address = "EuhcFYpMXoDUgTKNTmBEx3gtuaMpKgMTZ5ZBztbwL32Q"
-
-
-# nft 2 metadata
-[[test.validator.clone]]
-address = "9umFMEbzrXjPqkcbUCcedzWosVzuaGz8Pm2ugeFeA4kM"
-
+address = "59xs2cXMT7ttKDcU5b6Bt6RKX21FJEa1TiUrrDJ6Ti5P"
 

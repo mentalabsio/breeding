@@ -7,10 +7,6 @@ import {
 } from "@solana/spl-token"
 import { AnchorWallet, WalletContextState } from "@solana/wallet-adapter-react"
 
-const programId = new web3.PublicKey(
-  "CxHUJkC6JEnQ4ybEziaA32Mibe41WkLRpJ7Esz9iUW3e"
-)
-
 const incineratorAddress = new web3.PublicKey(
   "1nc1nerator11111111111111111111111111111111"
 )
@@ -73,7 +69,7 @@ export const createBreeding = (
 ) => {
   const whitelistToken = findWhitelistTokenAddress(
     breedingMachineAddress,
-    programId
+    breedingProgram.programId
   )
 
   const init = async (
@@ -94,7 +90,7 @@ export const createBreeding = (
         breedingMachineAddress,
         mintParentA,
         mintParentB,
-        programId
+        breedingProgram.programId
       )
 
       const userAtaParentA = await utils.token.associatedAddress({
@@ -231,7 +227,7 @@ export const createBreeding = (
       breedingMachineAddress,
       mintParentA,
       mintParentB,
-      programId
+      breedingProgram.programId
     )
 
     const userAtaParentA = await utils.token.associatedAddress({
@@ -264,6 +260,31 @@ export const createBreeding = (
       owner: userWallet.publicKey,
     })
 
+    /**
+     * Additional instructions:
+     *
+     * Create userWhitelistAta
+     */
+    const additionalInstructions = []
+
+    const userWhitelistAtaAccountInfo = await connection.getAccountInfo(
+      userWhitelistAta
+    )
+
+    if (!userWhitelistAtaAccountInfo) {
+      const createAtaInstruction =
+        Token.createAssociatedTokenAccountInstruction(
+          ASSOCIATED_TOKEN_PROGRAM_ID,
+          TOKEN_PROGRAM_ID,
+          whitelistToken,
+          userWhitelistAta,
+          userWallet.publicKey,
+          userWallet.publicKey
+        )
+
+      additionalInstructions.push(createAtaInstruction)
+    }
+
     const tx = await breedingProgram.methods
       .finalizeBreeding()
       .accounts({
@@ -285,6 +306,7 @@ export const createBreeding = (
 
         userWallet: userWallet.publicKey,
       })
+      .preInstructions(additionalInstructions)
       .signers(signers)
       .rpc()
 
@@ -303,7 +325,7 @@ export const createBreeding = (
       breedingMachineAddress,
       mintParentA,
       mintParentB,
-      programId
+      breedingProgram.programId
     )
 
     const userAtaParentA = await utils.token.associatedAddress({
