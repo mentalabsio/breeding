@@ -1,6 +1,7 @@
 /** @jsxImportSource theme-ui */
 
-import useWalletNFTs, { NFT } from "@/hooks/useWalletNFTs"
+import { NFT } from "@/hooks/useWalletNFTs"
+import { useWallet } from "@solana/wallet-adapter-react"
 import Select, { StylesConfig } from "react-select"
 import { useThemeUI, Flex } from "theme-ui"
 
@@ -29,18 +30,27 @@ const SelectorNFTOptionLabel = ({
   )
 }
 
-const NFTSelectInput = ({ name, NFTs }: { name: string; NFTs: NFT[] }) => {
+const NFTSelectInput = ({
+  name,
+  NFTs = null,
+}: {
+  name: string
+  NFTs: NFT[]
+}) => {
   const { theme } = useThemeUI()
+  const { publicKey } = useWallet()
 
-  const options = NFTs.map((NFT) => ({
-    value: NFT.mint,
-    label: (
-      <SelectorNFTOptionLabel
-        imgSrc={NFT.externalMetadata.image}
-        name={NFT.onchainMetadata.data.name}
-      />
-    ),
-  }))
+  const options =
+    NFTs &&
+    NFTs.map((NFT) => ({
+      value: NFT.mint,
+      label: (
+        <SelectorNFTOptionLabel
+          imgSrc={NFT.externalMetadata.image}
+          name={NFT.onchainMetadata.data.name}
+        />
+      ),
+    }))
 
   const colourStyles: StylesConfig = {
     control: (styles) => ({
@@ -91,11 +101,17 @@ const NFTSelectInput = ({ name, NFTs }: { name: string; NFTs: NFT[] }) => {
   return (
     <Select
       name={name}
-      options={options}
+      options={options || []}
       styles={colourStyles}
       placeholder={
         <SelectorNFTOptionLabel
-          name="Select an NFT"
+          name={
+            publicKey
+              ? NFTs
+                ? "Select an NFT"
+                : "Loading NFTs..."
+              : "Connect your wallet."
+          }
           imgSrc="https://via.placeholder.com/480x480"
         />
       }

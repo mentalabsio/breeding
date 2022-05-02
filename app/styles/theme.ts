@@ -224,8 +224,8 @@ const theme: Theme = {
         lineHeight: 1.45,
         minHeight: "100vh",
         color: "text",
-        backgroundColor: "background",
         transition: "all .125s linear",
+        background: (props) => props.colors.backgroundGradient,
       },
 
       img: {

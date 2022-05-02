@@ -1,6 +1,6 @@
 import { PublicKey } from "@solana/web3.js"
 import { programs } from "@metaplex/js"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { getNFTsByOwner } from "utils/nfts"
 import { useConnection, useWallet } from "@solana/wallet-adapter-react"
 
@@ -31,30 +31,30 @@ export type NFT = {
 const useWalletNFTs = (creators: string[]) => {
   const { connection } = useConnection()
   const { publicKey } = useWallet()
-  const [walletNFTs, setWalletNFTs] = useState<Array<NFT>>([])
+  const [walletNFTs, setWalletNFTs] = useState<Array<NFT> | null>(null)
 
-  useEffect(() => {
-    const fetchNFTs = async () => {
-      console.log("[useWalletNFTs] Fetching NFTs...")
-      const NFTs = await getNFTsByOwner(publicKey, connection)
+  const fetchNFTs = useCallback(async () => {
+    console.log("[useWalletNFTs] Fetching NFTs...")
+    const NFTs = await getNFTsByOwner(publicKey, connection)
 
-      const filtered = NFTs.filter((NFT) => {
-        const obj = NFT.onchainMetadata.data.creators.find((value) => {
-          return creators.indexOf(value.address) !== -1
-        })
-
-        return obj
+    const filtered = NFTs.filter((NFT) => {
+      const obj = NFT.onchainMetadata.data.creators.find((value) => {
+        return creators.indexOf(value.address) !== -1
       })
 
-      setWalletNFTs(filtered)
-    }
+      return obj
+    })
 
+    setWalletNFTs(filtered)
+  }, [connection, publicKey])
+
+  useEffect(() => {
     if (publicKey) {
       fetchNFTs()
     }
   }, [publicKey])
 
-  return { walletNFTs }
+  return { walletNFTs, fetchNFTs }
 }
 
 export default useWalletNFTs

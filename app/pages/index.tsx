@@ -14,7 +14,7 @@ import { useEffect } from "react"
 
 export default function Home() {
   const anchorWallet = useAnchorWallet()
-  const { walletNFTs } = useWalletNFTs([
+  const { walletNFTs, fetchNFTs } = useWalletNFTs([
     "9bBjPXwFVzPSEA4BH2wFfDnzYTekQq6itf6JBNvzRW2C",
   ])
   const {
@@ -26,7 +26,7 @@ export default function Home() {
     userTokenBalance,
   } = useBreeding()
 
-  /** Just log some info */
+  /** Just log some info on mount */
   useEffect(() => {
     if (breedingMachineAccount) {
       const feeToken =
@@ -66,11 +66,21 @@ export default function Home() {
           marginTop: "4rem",
         }}
       >
-        <Heading mb=".8rem" variant="heading1">
-          Breeding
-        </Heading>
-        <Text>Generate a new NFT from two!</Text>
-
+        <Flex
+          sx={{
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            background: (props) => props.colors.backgroundGradient,
+            alignSelf: "stretch",
+            padding: "1.6rem 0",
+          }}
+        >
+          <Heading mb=".8rem" variant="heading1">
+            Breeding
+          </Heading>
+          <Text>Generate a new NFT from two!</Text>
+        </Flex>
         {/* 
         <Button onClick={initializeBreedingMachine}>initialize</Button> */}
 
@@ -91,30 +101,6 @@ export default function Home() {
             <Text>Total born: {breedingMachineAccount.born.toNumber()}</Text>
           </>
         )} */}
-
-        <Flex
-          sx={{
-            alignItems: "center",
-            gap: ".8rem",
-            margin: "1.6rem 0",
-            minHeight: "2.4rem",
-          }}
-        >
-          {feedbackStatus && (
-            <>
-              {feedbackStatus !== "Success!" && <LoadingIcon />}
-
-              <Text
-                sx={{
-                  color: feedbackStatus === "Success!" ? "success" : "text",
-                }}
-              >
-                {feedbackStatus}
-              </Text>
-            </>
-          )}{" "}
-          &nbsp;
-        </Flex>
 
         <Flex
           my="3.2rem"
@@ -139,7 +125,7 @@ export default function Home() {
                 const data = new FormData(e.currentTarget)
                 const mints = data.getAll("mint").filter((val) => val)
 
-                if (!anchorWallet?.publicKey) throw new Error("No public key.")
+                if (!anchorWallet?.publicKey) return true
 
                 if (mints.length !== 2) return true
 
@@ -148,7 +134,8 @@ export default function Home() {
                   new web3.PublicKey(mints[1])
                 )
 
-                console.log(res)
+                await fetchNFTs()
+
                 return res
               }}
               sx={{
@@ -205,6 +192,30 @@ export default function Home() {
                 >
                   breed!
                 </Button>
+                <Flex
+                  sx={{
+                    alignItems: "center",
+                    gap: ".8rem",
+                    margin: "1.6rem 0",
+                    minHeight: "2.4rem",
+                  }}
+                >
+                  {feedbackStatus && (
+                    <>
+                      {feedbackStatus !== "Success!" && <LoadingIcon />}
+
+                      <Text
+                        sx={{
+                          color:
+                            feedbackStatus === "Success!" ? "success" : "text",
+                        }}
+                      >
+                        {feedbackStatus}
+                      </Text>
+                    </>
+                  )}{" "}
+                  &nbsp;
+                </Flex>
               </Flex>
             </form>
 
@@ -310,6 +321,8 @@ export default function Home() {
                                 breedData.breedData.mintA,
                                 breedData.breedData.mintB
                               )
+
+                              await fetchNFTs()
                             }}
                           >
                             Terminate
