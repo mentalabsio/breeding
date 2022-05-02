@@ -7,6 +7,7 @@ import {
 } from "@/utils/breeding"
 import { createBreeding } from "@/utils/breeding"
 import { getNFTMetadata } from "@/utils/nfts"
+import { useCandyMachine } from "../useCandyMachine"
 
 const parentsCandyMachineAddress = new web3.PublicKey(
   "9bBjPXwFVzPSEA4BH2wFfDnzYTekQq6itf6JBNvzRW2C"
@@ -31,6 +32,8 @@ const breedingMachineAuthority = new web3.PublicKey(
 export const useBreeding = () => {
   const { connection } = useConnection()
   const anchorWallet = useAnchorWallet()
+  const { alertState, onMint } = useCandyMachine()
+
   const [anchorProgram, setAnchorProgram] = useState<Program<Idl>>(null)
   const [breedingMachineAccount, setBreedingMachineAccount] = useState(null)
   const [userBreedDatas, setUserBreedDatas] = useState(null)
@@ -280,6 +283,13 @@ export const useBreeding = () => {
       setFeedbackStatus("[Breed] Confirming transaction...")
 
       await connection.confirmTransaction(tx, "confirmed")
+
+      /**
+       * @TODO MUST REMOVE the mint from here if there is locktime
+       */
+      setFeedbackStatus("[Breed] Awaiting approval to mint the new NFT...")
+
+      await onMint()
 
       setFeedbackStatus("Success!")
 

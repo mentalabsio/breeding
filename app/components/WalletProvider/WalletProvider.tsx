@@ -1,9 +1,9 @@
-import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
+import { WalletAdapterNetwork } from "@solana/wallet-adapter-base"
 import {
   ConnectionProvider,
   WalletProvider,
-} from "@solana/wallet-adapter-react";
-import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
+} from "@solana/wallet-adapter-react"
+import { WalletModalProvider } from "@solana/wallet-adapter-react-ui"
 import {
   LedgerWalletAdapter,
   PhantomWalletAdapter,
@@ -12,23 +12,23 @@ import {
   SolletExtensionWalletAdapter,
   SolletWalletAdapter,
   TorusWalletAdapter,
-} from "@solana/wallet-adapter-wallets";
-import React, { useMemo } from "react";
+} from "@solana/wallet-adapter-wallets"
+import React, { useMemo } from "react"
 
 // Default styles that can be overridden by your app
-require("@solana/wallet-adapter-react-ui/styles.css");
+require("@solana/wallet-adapter-react-ui/styles.css")
 
 const Wallet = ({ children }: { children: React.ReactChild }) => {
   // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'.
   const network = process.env
-    .NEXT_PUBLIC_CONNECTION_NETWORK as WalletAdapterNetwork;
+    .NEXT_PUBLIC_CONNECTION_NETWORK as WalletAdapterNetwork
 
   const endpoint =
     process.env.NEXT_PUBLIC_CONNECTION_NETWORK == "devnet"
       ? process.env.NEXT_PUBLIC_SOLANA_RPC_HOST_DEVNET
       : process.env.NEXT_PUBLIC_CONNECTION_NETWORK == "mainnet-beta"
       ? process.env.NEXT_PUBLIC_SOLANA_RPC_HOST_MAINNET_BETA
-      : process.env.NEXT_PUBLIC_SOLANA_RPC_HOST_LOCALNET;
+      : process.env.NEXT_PUBLIC_SOLANA_RPC_HOST_LOCALNET
 
   // @solana/wallet-adapter-wallets includes all the adapters but supports tree shaking and lazy loading --
   // Only the wallets you configure here will be compiled into your application, and only the dependencies
@@ -44,7 +44,7 @@ const Wallet = ({ children }: { children: React.ReactChild }) => {
       new SolletExtensionWalletAdapter({ network }),
     ],
     [network]
-  );
+  )
 
   return (
     <ConnectionProvider
@@ -53,7 +53,7 @@ const Wallet = ({ children }: { children: React.ReactChild }) => {
         commitment: "confirmed",
       }}
     >
-      <WalletProvider wallets={wallets} autoConnect>
+      <WalletProvider wallets={wallets}>
         <WalletModalProvider>
           {/* <WalletMultiButton />
           <WalletDisconnectButton /> */}
@@ -63,7 +63,7 @@ const Wallet = ({ children }: { children: React.ReactChild }) => {
         </WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>
-  );
-};
+  )
+}
 
-export default Wallet;
+export default Wallet

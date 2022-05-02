@@ -5,9 +5,8 @@ import { PlusSign } from "@/components/icons"
 import { LoadingIcon } from "@/components/icons/LoadingIcon"
 import NFTSelector from "@/components/NFTSelector/NFTSelector"
 import { useBreeding } from "@/hooks/useBreeding/useBreeding"
-import { useCandyMachine } from "@/hooks/useCandyMachine"
-import { web3, BN } from "@project-serum/anchor"
-import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react"
+import { web3 } from "@project-serum/anchor"
+import { useAnchorWallet } from "@solana/wallet-adapter-react"
 import { Button, Flex, Heading, Text } from "@theme-ui/components"
 import Head from "next/head"
 import { useEffect } from "react"
@@ -22,7 +21,6 @@ export default function Home() {
     feedbackStatus,
     userTokenBalance,
   } = useBreeding()
-  const { alertState, onMint } = useCandyMachine()
 
   /** Just log some info */
   useEffect(() => {
@@ -68,6 +66,7 @@ export default function Home() {
           Breed
         </Heading>
         <Text>Generate a new NFT from two!</Text>
+
         {/* 
         <Button onClick={initializeBreedingMachine}>initialize</Button> */}
 
@@ -185,10 +184,14 @@ export default function Home() {
                   gap: ".8rem",
                 }}
               >
-                <Text>
-                  {cost && "Cost: " + cost} | Your Balance:{" "}
-                  {userTokenBalance || "0"}
-                </Text>
+                {cost && anchorWallet?.publicKey ? (
+                  <Text>
+                    {cost && "Cost: " + cost} | Your Balance:{" "}
+                    {userTokenBalance || "0"}
+                  </Text>
+                ) : (
+                  <>&nbsp; </>
+                )}
                 <Button
                   sx={{
                     alignSelf: "center",
@@ -200,10 +203,10 @@ export default function Home() {
               </Flex>
             </form>
 
-            <Heading variant="heading1" mt="4.8rem">
-              Your breeds
+            <Heading variant="heading1" mt="4.8rem" mb=".8rem">
+              Your breedings
             </Heading>
-            <Flex
+            {/* <Flex
               sx={{
                 alignItems: "center",
                 gap: ".8rem",
@@ -225,7 +228,7 @@ export default function Home() {
                 </>
               )}{" "}
               &nbsp;
-            </Flex>
+            </Flex> */}
             {userBreedDatas ? (
               userBreedDatas.length ? (
                 <Flex
@@ -301,8 +304,6 @@ export default function Home() {
                                 breedData.breedData.mintA,
                                 breedData.breedData.mintB
                               )
-
-                              await onMint()
                             }}
                           >
                             Terminate
@@ -320,8 +321,10 @@ export default function Home() {
               ) : (
                 <Text>Empty.</Text>
               )
-            ) : (
+            ) : anchorWallet?.publicKey ? (
               <LoadingIcon />
+            ) : (
+              "Connect your wallet first."
             )}
           </Flex>
         </Flex>
