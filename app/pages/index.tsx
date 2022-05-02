@@ -68,32 +68,79 @@ export default function Home() {
           justifyContent: "center",
           alignItems: "center",
           maxWidth: "78rem",
-          margin: "4rem auto",
+          margin: "0 auto",
           padding: "0 1.6rem",
         }}
       >
         <Flex
           sx={{
-            flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
             background: (props) => props.colors.background,
             alignSelf: "stretch",
             padding: "1.6rem 0",
+            margin: "3.2rem 0",
+            gap: "3.2rem",
+
+            flexDirection: "column",
+
+            "@media (min-width: 768px)": {
+              flexDirection: "row",
+            },
           }}
         >
-          <Heading
+          <Flex
             sx={{
-              letterSpacing: "-2px",
-              textShadow: "0 3px 12px rgb(0 0 0 / 13%)",
-              fontSize: "4.8rem",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
             }}
-            mb=".8rem"
-            variant="heading1"
           >
-            Breed your Nanas
-          </Heading>
-          <Text>Get a brand new Baby Nana from two OG Nanas!</Text>
+            <Heading
+              sx={{
+                letterSpacing: "-2px",
+                textShadow: "0 3px 12px rgb(0 0 0 / 13%)",
+                fontSize: "4rem",
+
+                // "-webkit-background-clip": "text",
+
+                // "-webkit-text-fill-color": "transparent",
+                backgroundImage: (props) => props.colors.primaryGradient2,
+                backgroundClip: "text",
+                color: "transparent",
+                // background: (props) => props.colors.primaryGradient,
+              }}
+              mb=".8rem"
+              variant="heading1"
+            >
+              Breed your Nanas
+            </Heading>
+            <Text>Get a brand new Baby Nana from two OG Nanas!</Text>
+          </Flex>
+
+          <Flex
+            sx={{
+              alignItems: "center",
+              gap: ".8rem",
+            }}
+          >
+            {/* <img
+              sx={{
+                maxWidth: "24rem",
+              }}
+              src="/babynana1.png"
+              alt="Baby Nana"
+              title="Baby Nana"
+            /> */}
+            <img
+              sx={{
+                maxWidth: "16rem",
+              }}
+              src="/babynana2.png"
+              alt="Baby Nana"
+              title="Baby Nana"
+            />
+          </Flex>
         </Flex>
         {/* 
         <Button onClick={initializeBreedingMachine}>initialize</Button> */}
@@ -131,7 +178,9 @@ export default function Home() {
               alignItems: "center",
             }}
           >
-            <Heading variant="heading2">Select two Nanas to breed:</Heading>
+            <Heading variant="heading2" mb="1.6rem">
+              Select two Nifty Nanas to breed:
+            </Heading>
 
             <form
               onSubmit={async (e) => {
@@ -312,7 +361,7 @@ export default function Home() {
                                 breedData.metadatas[0].externalMetadata.image
                               }
                               sx={{
-                                maxHeight: "3.2rem",
+                                maxHeight: "6.4rem",
                               }}
                             />
                             {breedData.metadatas[0].externalMetadata.name}
@@ -336,7 +385,7 @@ export default function Home() {
                                 breedData.metadatas[1].externalMetadata.image
                               }
                               sx={{
-                                maxHeight: "3.2rem",
+                                maxHeight: "6.4rem",
                               }}
                             />
                             {breedData.metadatas[1].externalMetadata.name}

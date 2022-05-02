@@ -113,7 +113,7 @@ const NFTSelectInput = ({
                 : "Loading NFTs..."
               : "Connect your wallet."
           }
-          imgSrc="https://via.placeholder.com/480x480"
+          imgSrc="/nanas-avatar.jpg"
         />
       }
     />

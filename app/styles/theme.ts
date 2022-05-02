@@ -20,6 +20,7 @@ const theme: Theme = {
     text: "rgb(255, 255, 255)",
     primary: "rgb(255, 105, 173)",
     primaryGradient: getGradient("rgb(255, 105, 173)"),
+    primaryGradient2: "linear-gradient(45deg, #ff69ad, #fffa5a)",
     heading: "rgb(226, 217, 211)",
     background2: "#1E1E24",
     backgroundGradient: getGradient("rgb(14, 14, 14)"),
@@ -54,7 +55,7 @@ const theme: Theme = {
     primary: {
       display: "flex",
       color: "background",
-      background: (theme) => theme.colors?.primaryGradient,
+      background: (theme) => theme.colors?.primaryGradient2,
       border: "1px solid transparent",
       transition: "all .125s linear",
       alignItems: "center",
@@ -76,7 +77,7 @@ const theme: Theme = {
     },
     secondary: {
       display: "flex",
-      color: "background",
+      color: "heading",
       background: (theme) => theme.colors?.backgroundGradient,
       border: "1px solid transparent",
       transition: "all .125s linear",
@@ -167,11 +168,14 @@ const theme: Theme = {
       fontWeight: 900,
     },
     heading2: {
-      color: "heading",
       lineHeight: "body",
       fontSize: "1.9rem",
       fontFamily: "heading",
       fontWeight: 600,
+
+      backgroundImage: (props) => props.colors.primaryGradient,
+      backgroundClip: "text",
+      color: "transparent",
     },
     heading3: {
       color: "heading",
@@ -219,7 +223,7 @@ const theme: Theme = {
         minHeight: "100vh",
         color: "text",
         transition: "all .125s linear",
-        background: (props) => props.colors.background,
+        background: (props) => props.colors.backgroundGradient,
       },
 
       img: {
