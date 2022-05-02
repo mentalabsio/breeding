@@ -352,9 +352,9 @@ export const mintOneToken = async (
   payer: anchor.web3.PublicKey,
   beforeTransactions: Transaction[] = [],
   afterTransactions: Transaction[] = [],
-  setupState?: SetupState
+  setupMint?: anchor.web3.Keypair
 ): Promise<string[]> => {
-  const mint = setupState?.mint ?? anchor.web3.Keypair.generate()
+  const mint = setupMint ?? anchor.web3.Keypair.generate()
   const userTokenAccountAddress = (
     await getAtaForMint(mint.publicKey, payer)
   )[0]
@@ -368,8 +368,8 @@ export const mintOneToken = async (
   const cleanupInstructions = []
   const instructions = []
   const signers: anchor.web3.Keypair[] = []
-  console.log("SetupState: ", setupState)
-  if (!setupState) {
+  console.log("setupMint: ", setupMint)
+  if (!setupMint) {
     signers.push(mint)
     instructions.push(
       ...[

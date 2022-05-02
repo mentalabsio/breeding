@@ -6,6 +6,7 @@ import {
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token"
 import { AnchorWallet, WalletContextState } from "@solana/wallet-adapter-react"
+import { TransactionInstruction } from "@solana/web3.js"
 
 const incineratorAddress = new web3.PublicKey(
   "1nc1nerator11111111111111111111111111111111"
@@ -218,7 +219,9 @@ export const createBreeding = (
   const terminate = async (
     mintParentA: web3.PublicKey,
     mintParentB: web3.PublicKey,
-    signers: web3.Keypair[] = []
+    signers: web3.Keypair[] = [],
+    /** Instructions to be added posterior to the handler */
+    postInstructions: TransactionInstruction[] = []
   ) => {
     if (!mintParentA || !mintParentB)
       throw new Error("Mint addresses are missing.")
@@ -307,6 +310,7 @@ export const createBreeding = (
         userWallet: userWallet.publicKey,
       })
       .preInstructions(additionalInstructions)
+      .postInstructions(postInstructions)
       .signers(signers)
       .rpc()
 

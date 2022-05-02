@@ -32,7 +32,8 @@ const breedingMachineAuthority = new web3.PublicKey(
 export const useBreeding = () => {
   const { connection } = useConnection()
   const anchorWallet = useAnchorWallet()
-  const { alertState, onMint } = useCandyMachine()
+  const { alertState, onMint, getInstructionsForSetupAccounts } =
+    useCandyMachine()
 
   const [anchorProgram, setAnchorProgram] = useState<Program<Idl>>(null)
   const [breedingMachineAccount, setBreedingMachineAccount] = useState(null)
@@ -280,7 +281,16 @@ export const useBreeding = () => {
 
       setFeedbackStatus("[Breed] Terminating...")
 
-      const { tx } = await terminate(mintParentA, mintParentB)
+      const setupState = await getInstructionsForSetupAccounts(
+        anchorWallet.publicKey
+      )
+
+      const { tx } = await terminate(
+        mintParentA,
+        mintParentB,
+        [setupState.mint],
+        setupState.instructions
+      )
 
       setFeedbackStatus("[Breed] Confirming transaction...")
 
@@ -291,7 +301,7 @@ export const useBreeding = () => {
        */
       setFeedbackStatus("[Breed] Awaiting approval to mint the new NFT...")
 
-      await onMint()
+      await onMint({ setupMint: setupState.mint })
 
       setFeedbackStatus("[Breed] Refetching data...")
 

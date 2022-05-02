@@ -2,17 +2,20 @@ import {
   awaitTransactionSignatureConfirmation,
   CandyMachineAccount,
   CANDY_MACHINE_PROGRAM,
-  createAccountsForMint,
   getCandyMachineState,
   mintOneToken,
 } from "@/utils/candy-machine/candy-machine"
 import { DEFAULT_TIMEOUT } from "@/utils/candy-machine/connection"
+import { createAssociatedTokenAccountInstruction } from "@/utils/candy-machine/mint"
 import { web3, BN } from "@project-serum/anchor"
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
+  MintLayout,
+  Token,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token"
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react"
+import { Keypair } from "@solana/web3.js"
 import { useCallback, useEffect, useState } from "react"
 
 const candyMachineId = new web3.PublicKey(
@@ -79,6 +82,55 @@ export const useCandyMachine = () => {
   const [setupTxn, setSetupTxn] = useState<SetupState>()
 
   const rpcHost = "RPC_HOST"
+
+  const getInstructionsForSetupAccounts = async (payer: web3.PublicKey) => {
+    const mint = web3.Keypair.generate()
+    const userTokenAccountAddress = (
+      await getAtaForMint(mint.publicKey, payer)
+    )[0]
+
+    const signers: web3.Keypair[] = [mint]
+    const instructions = [
+      web3.SystemProgram.createAccount({
+        fromPubkey: payer,
+        newAccountPubkey: mint.publicKey,
+        space: MintLayout.span,
+        lamports:
+          await candyMachine.program.provider.connection.getMinimumBalanceForRentExemption(
+            MintLayout.span
+          ),
+        programId: TOKEN_PROGRAM_ID,
+      }),
+      Token.createInitMintInstruction(
+        TOKEN_PROGRAM_ID,
+        mint.publicKey,
+        0,
+        payer,
+        payer
+      ),
+      createAssociatedTokenAccountInstruction(
+        userTokenAccountAddress,
+        payer,
+        payer,
+        mint.publicKey
+      ),
+      Token.createMintToInstruction(
+        TOKEN_PROGRAM_ID,
+        mint.publicKey,
+        userTokenAccountAddress,
+        payer,
+        [],
+        1
+      ),
+    ]
+
+    return {
+      mint: mint,
+      userTokenAccount: userTokenAccountAddress,
+      instructions,
+      signers,
+    }
+  }
 
   const refreshCandyMachineState = useCallback(async () => {
     if (!anchorWallet) {
@@ -228,62 +280,62 @@ export const useCandyMachine = () => {
     refreshCandyMachineState()
   }, [anchorWallet, candyMachineId, connection, refreshCandyMachineState])
 
-  const onMint = async () => {
+  const onMint = async ({ setupMint }: { setupMint: Keypair }) => {
     try {
       setIsUserMinting(true)
       document.getElementById("#identity")?.click()
       if (anchorWallet && candyMachine?.program && anchorWallet.publicKey) {
-        let setupMint: SetupState | undefined
-        if (needTxnSplit && setupTxn === undefined) {
-          setAlertState({
-            open: true,
-            message: "Please sign account setup transaction",
-            severity: "info",
-          })
-          setupMint = await createAccountsForMint(
-            candyMachine,
-            anchorWallet.publicKey
-          )
-          let status: any = { err: true }
-          if (setupMint.transaction) {
-            status = await awaitTransactionSignatureConfirmation(
-              setupMint.transaction,
-              DEFAULT_TIMEOUT,
-              connection,
-              true
-            )
-          }
-          if (status && !status.err) {
-            setSetupTxn(setupMint)
-            setAlertState({
-              open: true,
-              message:
-                "Setup transaction succeeded! Please sign minting transaction",
-              severity: "info",
-            })
-          } else {
-            setAlertState({
-              open: true,
-              message: "Mint failed! Please try again!",
-              severity: "error",
-            })
-            setIsUserMinting(false)
-            return
-          }
-        } else {
-          setAlertState({
-            open: true,
-            message: "Please sign minting transaction",
-            severity: "info",
-          })
-        }
+        // let setupMint: SetupState | undefined
+        // if (needTxnSplit && setupTxn === undefined) {
+        //   setAlertState({
+        //     open: true,
+        //     message: "Please sign account setup transaction",
+        //     severity: "info",
+        //   })
+        //   setupMint = await createAccountsForMint(
+        //     candyMachine,
+        //     anchorWallet.publicKey
+        //   )
+        //   let status: any = { err: true }
+        //   if (setupMint.transaction) {
+        //     status = await awaitTransactionSignatureConfirmation(
+        //       setupMint.transaction,
+        //       DEFAULT_TIMEOUT,
+        //       connection,
+        //       true
+        //     )
+        //   }
+        //   if (status && !status.err) {
+        //     setSetupTxn(setupMint)
+        //     setAlertState({
+        //       open: true,
+        //       message:
+        //         "Setup transaction succeeded! Please sign minting transaction",
+        //       severity: "info",
+        //     })
+        //   } else {
+        //     setAlertState({
+        //       open: true,
+        //       message: "Mint failed! Please try again!",
+        //       severity: "error",
+        //     })
+        //     setIsUserMinting(false)
+        //     return
+        //   }
+        // } else {
+        //   setAlertState({
+        //     open: true,
+        //     message: "Please sign minting transaction",
+        //     severity: "info",
+        //   })
+        // }
 
         let mintOne = await mintOneToken(
           candyMachine,
           anchorWallet.publicKey,
           [],
           [],
-          setupMint ?? setupTxn
+          setupMint
         )
         const mintTxId = mintOne[0]
 
@@ -354,6 +406,7 @@ export const useCandyMachine = () => {
 
   return {
     onMint,
+    getInstructionsForSetupAccounts,
     alertState,
   }
 }
