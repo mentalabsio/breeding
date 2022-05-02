@@ -3,7 +3,7 @@
 import { NFT } from "@/hooks/useWalletNFTs"
 import { useWallet } from "@solana/wallet-adapter-react"
 import Select, { StylesConfig } from "react-select"
-import { useThemeUI, Flex } from "theme-ui"
+import { useThemeUI, Flex, Text } from "theme-ui"
 
 const SelectorNFTOptionLabel = ({
   imgSrc,
@@ -25,7 +25,7 @@ const SelectorNFTOptionLabel = ({
           maxHeight: "4.8rem",
         }}
       />
-      {name}
+      <Text mr="1.6rem">{name}</Text>
     </Flex>
   )
 }
