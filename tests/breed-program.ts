@@ -118,7 +118,7 @@ describe("breed-program", () => {
     const tx = await program.methods
       .updateMachineConfig({
         initializationFeePrice: newPrice,
-        breedingTime: new anchor.BN(1),
+        breedingTime: new anchor.BN(0),
         burnParents: false,
       })
       .accounts({

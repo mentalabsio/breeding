@@ -280,7 +280,7 @@ export const useCandyMachine = () => {
     refreshCandyMachineState()
   }, [anchorWallet, candyMachineId, connection, refreshCandyMachineState])
 
-  const onMint = async ({ setupMint }: { setupMint: Keypair }) => {
+  const onMint = async ({ setupMint }: { setupMint?: Keypair }) => {
     try {
       setIsUserMinting(true)
       document.getElementById("#identity")?.click()
@@ -406,6 +406,7 @@ export const useCandyMachine = () => {
 
   return {
     onMint,
+    candyMachine,
     getInstructionsForSetupAccounts,
     alertState,
   }

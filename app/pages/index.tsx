@@ -18,7 +18,7 @@ export default function Home() {
     "9bBjPXwFVzPSEA4BH2wFfDnzYTekQq6itf6JBNvzRW2C",
   ])
   const {
-    initializeBreeding,
+    initializeAndTerminateBreeding,
     terminateBreeding,
     onMint,
     breedingMachineAccount,
@@ -193,7 +193,7 @@ export default function Home() {
 
                 if (mints.length !== 2) return true
 
-                const res = await initializeBreeding(
+                const res = await initializeAndTerminateBreeding(
                   new web3.PublicKey(mints[0]),
                   new web3.PublicKey(mints[1])
                 )
@@ -283,32 +283,10 @@ export default function Home() {
               </Flex>
             </form>
 
-            <Heading variant="heading2" mt="4.8rem" mb=".8rem">
+            {/* <Heading variant="heading2" mt="4.8rem" mb=".8rem">
               Your current breedings
             </Heading>
-            {/* <Flex
-              sx={{
-                alignItems: "center",
-                gap: ".8rem",
-                margin: "1.6rem 0",
-              }}
-            >
-              {alertState.message && (
-                <>
-                  {alertState.severity !== "success" && <LoadingIcon />}
 
-                  <Text
-                    sx={{
-                      color:
-                        alertState.severity === "success" ? "success" : "text",
-                    }}
-                  >
-                    {alertState.message}
-                  </Text>
-                </>
-              )}{" "}
-              &nbsp;
-            </Flex> */}
             <Flex
               sx={{
                 flexDirection: "column",
@@ -418,9 +396,9 @@ export default function Home() {
               ) : (
                 <Text>Connect your wallet first.</Text>
               )}
-            </Flex>
+            </Flex> */}
 
-            {/* <Text
+            <Text
               variant="small"
               sx={{
                 display: "flex",
@@ -429,11 +407,12 @@ export default function Home() {
                 margin: "1.6rem 0",
               }}
             >
-              <Button variant="resetted" onClick={onMint}>
+              <Text variant="small">stuck?</Text>
+              <Button variant="resetted" onClick={() => onMint({})}>
                 click here
               </Button>{" "}
               <Text variant="xsmall">to mint manually</Text>
-            </Text> */}
+            </Text>
           </Flex>
         </Flex>
       </main>

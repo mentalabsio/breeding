@@ -73,7 +73,46 @@ export const createBreeding = (
     breedingProgram.programId
   )
 
+  /**
+   * Calls init method through RPC
+   */
   const init = async (
+    mintParentA: web3.PublicKey,
+    mintParentB: web3.PublicKey,
+    signers: web3.Keypair[] = []
+  ) => {
+    try {
+      if (!mintParentA || !mintParentB)
+        throw new Error("Mint addresses are missing.")
+
+      const {
+        instruction,
+        userAtaParentA,
+        userAtaParentB,
+        vaultAtaParentA,
+        vaultAtaParentB,
+      } = await getInitInstruction(mintParentA, mintParentB, signers)
+
+      const tx = await instruction.rpc()
+
+      return {
+        tx,
+        userAtaParentA,
+        userAtaParentB,
+        vaultAtaParentA,
+        vaultAtaParentB,
+      }
+    } catch (e) {
+      console.log(e)
+
+      throw e
+    }
+  }
+
+  /**
+   * Returns instruction for init method
+   */
+  const getInitInstruction = async (
     mintParentA: web3.PublicKey,
     mintParentB: web3.PublicKey,
     signers: web3.Keypair[] = []
@@ -176,7 +215,7 @@ export const createBreeding = (
       )
 
       // setFeedbackStatus("[Breed] Sending transaction...")
-      const tx = await breedingProgram.methods
+      const instruction = breedingProgram.methods
         .initializeBreeding()
         .accounts({
           breedingMachine: breedingMachineAddress,
@@ -200,10 +239,9 @@ export const createBreeding = (
         })
         .preInstructions(additionalInstructions)
         .signers(signers)
-        .rpc()
 
       return {
-        tx,
+        instruction,
         userAtaParentA,
         userAtaParentB,
         vaultAtaParentA,
@@ -216,12 +254,36 @@ export const createBreeding = (
     }
   }
 
+  /**
+   * Calls terminate method through RPC
+   */
   const terminate = async (
     mintParentA: web3.PublicKey,
     mintParentB: web3.PublicKey,
-    signers: web3.Keypair[] = [],
-    /** Instructions to be added posterior to the handler */
-    postInstructions: TransactionInstruction[] = []
+    signers: web3.Keypair[] = []
+  ) => {
+    if (!mintParentA || !mintParentB)
+      throw new Error("Mint addresses are missing.")
+
+    const {
+      instruction,
+      userWhitelistAta,
+      breedData,
+      userAtaParentB,
+      userAtaParentA,
+    } = await getTerminateInstruction(mintParentA, mintParentB, signers)
+
+    const tx = await instruction.rpc()
+    return { tx, userWhitelistAta, breedData, userAtaParentB, userAtaParentA }
+  }
+
+  /**
+   * Returns instruction for terminate method
+   */
+  const getTerminateInstruction = async (
+    mintParentA: web3.PublicKey,
+    mintParentB: web3.PublicKey,
+    signers: web3.Keypair[] = []
   ) => {
     if (!mintParentA || !mintParentB)
       throw new Error("Mint addresses are missing.")
@@ -288,7 +350,7 @@ export const createBreeding = (
       additionalInstructions.push(createAtaInstruction)
     }
 
-    const tx = await breedingProgram.methods
+    const instruction = breedingProgram.methods
       .finalizeBreeding()
       .accounts({
         breedingMachine: breedingMachineAddress,
@@ -310,11 +372,15 @@ export const createBreeding = (
         userWallet: userWallet.publicKey,
       })
       .preInstructions(additionalInstructions)
-      .postInstructions(postInstructions)
       .signers(signers)
-      .rpc()
 
-    return { tx, userWhitelistAta, breedData, userAtaParentB, userAtaParentA }
+    return {
+      instruction,
+      userWhitelistAta,
+      breedData,
+      userAtaParentB,
+      userAtaParentA,
+    }
   }
 
   const cancel = async (
@@ -375,5 +441,11 @@ export const createBreeding = (
     return { tx, breedData, userAtaParentB, userAtaParentA }
   }
 
-  return { init, terminate, cancel }
+  return {
+    init,
+    terminate,
+    cancel,
+    getTerminateInstruction,
+    getInitInstruction,
+  }
 }

@@ -8,6 +8,7 @@ import {
 import { createBreeding } from "@/utils/breeding"
 import { getNFTMetadata } from "@/utils/nfts"
 import { useCandyMachine } from "../useCandyMachine"
+import { Transaction } from "@solana/web3.js"
 
 const parentsCandyMachineAddress = new web3.PublicKey(
   "9bBjPXwFVzPSEA4BH2wFfDnzYTekQq6itf6JBNvzRW2C"
@@ -281,20 +282,93 @@ export const useBreeding = () => {
 
       setFeedbackStatus("[Breed] Terminating...")
 
-      const setupState = await getInstructionsForSetupAccounts(
-        anchorWallet.publicKey
-      )
-
-      const { tx } = await terminate(
-        mintParentA,
-        mintParentB,
-        [setupState.mint],
-        setupState.instructions
-      )
+      const { tx } = await terminate(mintParentA, mintParentB)
 
       setFeedbackStatus("[Breed] Confirming transaction...")
 
       await connection.confirmTransaction(tx, "confirmed")
+
+      setFeedbackStatus("[Breed] Refetching data...")
+
+      await fetchData()
+
+      setFeedbackStatus("Success!")
+
+      setTimeout(() => {
+        setFeedbackStatus("")
+      }, 6000)
+    } catch (e) {
+      console.log(e)
+
+      setFeedbackStatus("Something went wrong. " + e + "")
+
+      setTimeout(() => {
+        fetchData()
+      }, 6000)
+    }
+  }
+
+  const initializeAndTerminateBreeding = async (
+    mintParentA: web3.PublicKey,
+    mintParentB: web3.PublicKey
+  ) => {
+    try {
+      if (!anchorProgram) throw new Error("Anchor program is not initialized.")
+
+      if (!mintParentA || !mintParentB)
+        throw new Error("Mint addresses are missing.")
+
+      const breedingMachine = findBreedingMachineAddress(
+        parentsCandyMachineAddress,
+        rewardsCandyMachineAddress,
+        /** Authority pubkey */
+        breedingMachineAuthority,
+        programId
+      )
+
+      const { getInitInstruction, getTerminateInstruction } = createBreeding(
+        connection,
+        anchorProgram,
+        breedingMachine,
+        anchorWallet
+      )
+
+      setFeedbackStatus("[Breed] Building instructions...")
+
+      const setupState = await getInstructionsForSetupAccounts(
+        anchorWallet.publicKey
+      )
+
+      const { instruction: initInstruction } = await getInitInstruction(
+        mintParentA,
+        mintParentB
+      )
+
+      const ixInit = await initInstruction.instruction()
+
+      const { instruction: terminateInstruction } =
+        await getTerminateInstruction(mintParentA, mintParentB)
+
+      const ixTerminate = await terminateInstruction.instruction()
+
+      const latest = await connection.getLatestBlockhash()
+
+      const tx = new Transaction({
+        feePayer: anchorWallet.publicKey,
+        recentBlockhash: latest.blockhash,
+      })
+
+        .add(ixInit)
+        .add(ixTerminate)
+        .add(...setupState.instructions)
+
+      setFeedbackStatus("[Breed] Awaiting approval...")
+
+      const txid = await anchorProgram.provider.send(tx, [setupState.mint])
+
+      setFeedbackStatus("[Breed] Confirming transaction...")
+
+      await connection.confirmTransaction(txid, "confirmed")
 
       /**
        * @TODO MUST REMOVE the mint from here if there is locktime
@@ -327,6 +401,7 @@ export const useBreeding = () => {
     initializeBreeding,
     terminateBreeding,
     initializeBreedingMachine,
+    initializeAndTerminateBreeding,
     onMint,
     breedingMachineAccount,
     userBreedDatas,
