@@ -52,8 +52,11 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Breeding UI</title>
-        <meta name="description" content="Breeding UI created by MagicShards" />
+        <title>Nifty Nanas Breeding</title>
+        <meta
+          name="description"
+          content="Nifty Nanas Breeding created by MagicShards"
+        />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -74,15 +77,23 @@ export default function Home() {
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            background: (props) => props.colors.backgroundGradient,
+            background: (props) => props.colors.background,
             alignSelf: "stretch",
             padding: "1.6rem 0",
           }}
         >
-          <Heading mb=".8rem" variant="heading1">
-            Breeding
+          <Heading
+            sx={{
+              letterSpacing: "-2px",
+              textShadow: "0 3px 12px rgb(0 0 0 / 13%)",
+              fontSize: "4.8rem",
+            }}
+            mb=".8rem"
+            variant="heading1"
+          >
+            Breed your Nanas
           </Heading>
-          <Text>Generate a new NFT from two!</Text>
+          <Text>Get a brand new Baby Nana from two OG Nanas!</Text>
         </Flex>
         {/* 
         <Button onClick={initializeBreedingMachine}>initialize</Button> */}
@@ -120,7 +131,7 @@ export default function Home() {
               alignItems: "center",
             }}
           >
-            <Heading variant="heading2">Select two NFTs to breed:</Heading>
+            <Heading variant="heading2">Select two Nanas to breed:</Heading>
 
             <form
               onSubmit={async (e) => {
