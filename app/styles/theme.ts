@@ -231,6 +231,7 @@ const theme: Theme = {
       img: {
         maxWidth: "100%",
         height: "auto",
+        borderRadius: ".4rem",
       },
 
       p: {

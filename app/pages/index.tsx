@@ -64,7 +64,9 @@ export default function Home() {
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          marginTop: "4rem",
+          maxWidth: "78rem",
+          margin: "4rem auto",
+          padding: "0 1.6rem",
         }}
       >
         <Flex
@@ -108,6 +110,7 @@ export default function Home() {
           sx={{
             flexDirection: "column",
             gap: "1.6rem",
+            alignSelf: "stretch",
           }}
         >
           <Flex
@@ -251,6 +254,7 @@ export default function Home() {
                 flexDirection: "column",
                 alignItems: "center",
                 minHeight: "2.4rem",
+                alignSelf: "stretch",
               }}
             >
               {userBreedDatas ? (
@@ -261,9 +265,23 @@ export default function Home() {
                         key={breedData.breedData.timestamp}
                         sx={{
                           flexDirection: "column",
-                          margin: "1.6rem 0",
                           alignItems: "center",
-                          justifyContent: "center",
+                          gap: "1.6rem",
+                          margin: "1.6rem 0",
+                          justifyContent: "space-between",
+                          alignSelf: "stretch",
+
+                          paddingBottom: "1.6rem",
+
+                          borderColor: "text",
+
+                          "&:not(:last-child)": {
+                            borderBottom: "1px solid",
+                          },
+
+                          "@media (min-width: 768px)": {
+                            flexDirection: "row",
+                          },
                         }}
                       >
                         <Flex
@@ -312,28 +330,23 @@ export default function Home() {
                             />
                             {breedData.metadatas[1].externalMetadata.name}
                           </Flex>
-                          <Button
-                            sx={{
-                              marginLeft: "1.6rem",
-                            }}
-                            variant="secondary"
-                            onClick={async () => {
-                              await terminateBreeding(
-                                breedData.breedData.mintA,
-                                breedData.breedData.mintB
-                              )
-
-                              await fetchNFTs()
-                            }}
-                          >
-                            Terminate
-                          </Button>
                         </Flex>
-                        {/* <Flex>
-                      {new Date(
-                        breedData.breedData.timestamp.toNumber() * 1000
-                      ).toLocaleString()}
-                    </Flex> */}
+                        <Button
+                          sx={{
+                            marginLeft: "1.6rem",
+                          }}
+                          variant="secondary"
+                          onClick={async () => {
+                            await terminateBreeding(
+                              breedData.breedData.mintA,
+                              breedData.breedData.mintB
+                            )
+
+                            await fetchNFTs()
+                          }}
+                        >
+                          Terminate
+                        </Button>
                       </Flex>
                     )
                   })
