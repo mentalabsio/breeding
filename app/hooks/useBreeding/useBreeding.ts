@@ -233,13 +233,15 @@ export const useBreeding = () => {
 
       await connection.confirmTransaction(tx, "confirmed")
 
+      setFeedbackStatus("[Breed] Refetching data...")
+
+      await fetchData()
+
       setFeedbackStatus("Success!")
 
       setTimeout(() => {
         setFeedbackStatus("")
       }, 6000)
-
-      fetchData()
     } catch (e) {
       console.log(e)
 
@@ -291,13 +293,15 @@ export const useBreeding = () => {
 
       await onMint()
 
+      setFeedbackStatus("[Breed] Refetching data...")
+
+      await fetchData()
+
       setFeedbackStatus("Success!")
 
       setTimeout(() => {
         setFeedbackStatus("")
       }, 6000)
-
-      fetchData()
     } catch (e) {
       console.log(e)
 
