@@ -100,7 +100,7 @@ const NFTSelectInput = ({
 
   return (
     <Select
-      key={"nftselect-" + options.length}
+      key={"nftselect-" + options?.length}
       name={name}
       options={options || []}
       styles={colourStyles}

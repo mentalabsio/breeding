@@ -313,6 +313,7 @@ export const useBreeding = () => {
     initializeBreeding,
     terminateBreeding,
     initializeBreedingMachine,
+    onMint,
     breedingMachineAccount,
     userBreedDatas,
     feedbackStatus,

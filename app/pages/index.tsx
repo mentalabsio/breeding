@@ -20,6 +20,7 @@ export default function Home() {
   const {
     initializeBreeding,
     terminateBreeding,
+    onMint,
     breedingMachineAccount,
     userBreedDatas,
     feedbackStatus,
@@ -345,6 +346,21 @@ export default function Home() {
                 <Text>Connect your wallet first.</Text>
               )}
             </Flex>
+
+            {/* <Text
+              variant="small"
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                margin: "1.6rem 0",
+              }}
+            >
+              <Button variant="resetted" onClick={onMint}>
+                click here
+              </Button>{" "}
+              <Text variant="xsmall">to mint manually</Text>
+            </Text> */}
           </Flex>
         </Flex>
       </main>
