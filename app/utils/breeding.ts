@@ -242,6 +242,7 @@ export const createBreeding = (
 
       return {
         instruction,
+        additionalInstructions,
         userAtaParentA,
         userAtaParentB,
         vaultAtaParentA,
@@ -376,6 +377,7 @@ export const createBreeding = (
 
     return {
       instruction,
+      additionalInstructions,
       userWhitelistAta,
       breedData,
       userAtaParentB,

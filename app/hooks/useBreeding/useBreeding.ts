@@ -339,15 +339,17 @@ export const useBreeding = () => {
         anchorWallet.publicKey
       )
 
-      const { instruction: initInstruction } = await getInitInstruction(
-        mintParentA,
-        mintParentB
-      )
+      const {
+        instruction: initInstruction,
+        additionalInstructions: initAdditional,
+      } = await getInitInstruction(mintParentA, mintParentB)
 
       const ixInit = await initInstruction.instruction()
 
-      const { instruction: terminateInstruction } =
-        await getTerminateInstruction(mintParentA, mintParentB)
+      const {
+        instruction: terminateInstruction,
+        additionalInstructions: terminateAdditional,
+      } = await getTerminateInstruction(mintParentA, mintParentB)
 
       const ixTerminate = await terminateInstruction.instruction()
 
@@ -358,9 +360,18 @@ export const useBreeding = () => {
         recentBlockhash: latest.blockhash,
       })
 
-        .add(ixInit)
-        .add(ixTerminate)
-        .add(...setupState.instructions)
+      if (initAdditional.length) {
+        tx.add(...initAdditional)
+      }
+
+      tx.add(ixInit)
+
+      if (terminateAdditional.length) {
+        tx.add(...terminateAdditional)
+      }
+
+      tx.add(ixTerminate)
+      tx.add(...setupState.instructions)
 
       setFeedbackStatus("[Breed] Awaiting approval...")
 
