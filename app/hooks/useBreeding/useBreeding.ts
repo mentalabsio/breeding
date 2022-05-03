@@ -102,9 +102,9 @@ export const useBreeding = () => {
       console.error("Couldn't fetch breeding machine!" + e)
     }
 
-    setFeedbackStatus("Fetching user breedings...")
-    /** Fetch all program accounts */
-    const programAccs = await connection.getProgramAccounts(programId)
+    // setFeedbackStatus("Fetching user breedings...")
+    // /** Fetch all program accounts */
+    // const programAccs = await connection.getProgramAccounts(programId)
 
     // try {
     //   const multiple = await anchorProgram.account.breedData.fetchMultiple(
@@ -117,43 +117,43 @@ export const useBreeding = () => {
     // }
 
     /** Get user breed datas */
-    const userBreedDatasPromises = programAccs.map(async (acc) => {
-      try {
-        /** Try to fetch breed data account using the program account address */
-        const breedData = await anchorProgram.account.breedData.fetch(
-          acc.pubkey
-        )
+    // const userBreedDatasPromises = programAccs.map(async (acc) => {
+    //   try {
+    //     /** Try to fetch breed data account using the program account address */
+    //     const breedData = await anchorProgram.account.breedData.fetch(
+    //       acc.pubkey
+    //     )
 
-        /** Return if the user wallet is the owner */
-        if (breedData.owner.toString() === anchorWallet.publicKey.toString()) {
-          return breedData
-        }
+    //     /** Return if the user wallet is the owner */
+    //     if (breedData.owner.toString() === anchorWallet.publicKey.toString()) {
+    //       return breedData
+    //     }
 
-        return null
-        /** Error will be throwed if discriminator is invalid (not a breedData account) */
-      } catch (e) {
-        return null
-      }
-    })
+    //     return null
+    //     /** Error will be throwed if discriminator is invalid (not a breedData account) */
+    //   } catch (e) {
+    //     return null
+    //   }
+    // })
 
-    const breedDatas = (await Promise.all(userBreedDatasPromises)).filter(
-      (value) => value !== null
-    )
+    // const breedDatas = (await Promise.all(userBreedDatasPromises)).filter(
+    //   (value) => value !== null
+    // )
 
-    const withNFTs = breedDatas.map(async (breedData) => {
-      const metadatas = await Promise.all([
-        getNFTMetadata(breedData.mintA, connection),
-        getNFTMetadata(breedData.mintB, connection),
-      ])
+    // const withNFTs = breedDatas.map(async (breedData) => {
+    //   const metadatas = await Promise.all([
+    //     getNFTMetadata(breedData.mintA, connection),
+    //     getNFTMetadata(breedData.mintB, connection),
+    //   ])
 
-      return { breedData, metadatas }
-    })
+    //   return { breedData, metadatas }
+    // })
 
-    const breedDatasWithNFTs = (await Promise.all(withNFTs)).filter(
-      (value) => value !== null
-    )
+    // const breedDatasWithNFTs = (await Promise.all(withNFTs)).filter(
+    //   (value) => value !== null
+    // )
 
-    setUserBreedDatas(breedDatasWithNFTs)
+    // setUserBreedDatas(breedDatasWithNFTs)
     setFeedbackStatus("")
   }, [connection, anchorWallet])
 
