@@ -68,7 +68,7 @@ export const useBreeding = () => {
     setAnchorProgram(anchorProgram)
 
     try {
-      setFeedbackStatus("Fetching breeding machine...")
+      setFeedbackStatus("Fetching machine...")
 
       const breedingMachine = findBreedingMachineAddress(
         parentsCandyMachineAddress,
@@ -99,10 +99,10 @@ export const useBreeding = () => {
       const balance = await connection.getTokenAccountBalance(addr)
       setUserTokenBalance(balance.value.uiAmount.toLocaleString())
     } catch (e) {
-      console.error("Couldn't fetch breeding machine!" + e)
+      console.error("Couldn't fetch machine!" + e)
     }
 
-    // setFeedbackStatus("Fetching user breedings...")
+    // setFeedbackStatus("Fetching user data...")
     // /** Fetch all program accounts */
     // const programAccs = await connection.getProgramAccounts(programId)
 
@@ -227,15 +227,15 @@ export const useBreeding = () => {
         anchorWallet
       )
 
-      setFeedbackStatus("[Breed] Initializing...")
+      setFeedbackStatus("Initializing...")
 
       const { tx } = await init(mintParentA, mintParentB)
 
-      setFeedbackStatus("[Breed] Confirming transaction...")
+      setFeedbackStatus("Confirming transaction...")
 
       await connection.confirmTransaction(tx, "confirmed")
 
-      setFeedbackStatus("[Breed] Refetching data...")
+      setFeedbackStatus("Refetching data...")
 
       await fetchData()
 
@@ -280,7 +280,7 @@ export const useBreeding = () => {
         anchorWallet
       )
 
-      setFeedbackStatus("[Breed] Terminating...")
+      setFeedbackStatus("Terminating...")
 
       const { tx } = await terminate(mintParentA, mintParentB)
 
@@ -377,18 +377,18 @@ export const useBreeding = () => {
 
       const txid = await anchorProgram.provider.send(tx, [setupState.mint])
 
-      setFeedbackStatus("[Breed] Confirming transaction...")
+      setFeedbackStatus("Confirming transaction...")
 
       await connection.confirmTransaction(txid, "confirmed")
 
       /**
        * @TODO MUST REMOVE the mint from here if there is locktime
        */
-      setFeedbackStatus("[Breed] Awaiting approval to mint the new NFT...")
+      setFeedbackStatus("Awaiting approval to mint the new NFT...")
 
       await onMint({ setupMint: setupState.mint })
 
-      setFeedbackStatus("[Breed] Refetching data...")
+      setFeedbackStatus("Refetching data...")
 
       await fetchData()
 
