@@ -205,6 +205,15 @@ const theme: Theme = {
       fontSize: "1rem",
     },
   },
+  alerts: {
+    primary: {
+      background: (props) => props.colors.backgroundGradient,
+      border: "1px solid",
+      borderColor: (props) => props.colors.primary,
+      fontWeight: 500,
+      opacity: 0.8,
+    },
+  },
 
   styles: {
     ...base.styles,

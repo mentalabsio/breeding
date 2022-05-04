@@ -8,7 +8,7 @@ import { useBreeding } from "@/hooks/useBreeding/useBreeding"
 import useWalletNFTs from "@/hooks/useWalletNFTs"
 import { web3 } from "@project-serum/anchor"
 import { useAnchorWallet } from "@solana/wallet-adapter-react"
-import { Button, Flex, Heading, Text } from "@theme-ui/components"
+import { Button, Flex, Heading, Text, Alert } from "@theme-ui/components"
 import Head from "next/head"
 import { useEffect } from "react"
 
@@ -52,7 +52,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Nifty Nanas Breeding</title>
+        <title>Nifty Nanas Propagation</title>
         <meta
           name="description"
           content="Nifty Nanas Breeding created by MagicShards"
@@ -113,9 +113,9 @@ export default function Home() {
               mb=".8rem"
               variant="heading1"
             >
-              Breed your Nanas
+              Propagate your Nanas
             </Heading>
-            <Text>Get a brand new Baby Nana from two OG Nanas!</Text>
+            <Text>Get a brand new Baby Nana from two Nifty Nanas!</Text>
           </Flex>
 
           <Flex
@@ -178,8 +178,8 @@ export default function Home() {
               alignItems: "center",
             }}
           >
-            <Heading variant="heading2" mb="1.6rem">
-              Select two Nifty Nanas to breed:
+            <Heading variant="heading2">
+              Select two Nifty Nanas to propagate:
             </Heading>
 
             <form
@@ -207,6 +207,7 @@ export default function Home() {
                 flexDirection: "column",
                 alignItems: "center",
                 gap: "3.2rem",
+                margin: "1.6rem 0",
               }}
             >
               <Flex
@@ -233,6 +234,12 @@ export default function Home() {
 
                 <NFTSelectInput name="mint" NFTs={walletNFTs} />
               </Flex>
+
+              <Alert mb={2}>
+                Your two Nifty Nanas&nbsp;<b>will</b>&nbsp;be burned to generate
+                the new Baby Nana!
+              </Alert>
+
               <Flex
                 sx={{
                   flexDirection: "column",
@@ -254,7 +261,7 @@ export default function Home() {
                   }}
                   type="submit"
                 >
-                  breed!
+                  propagate!
                 </Button>
                 <Flex
                   sx={{
