@@ -52,10 +52,10 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Nifty Nanas Propagation</title>
+        <title>Propagate your Nifty Nanas</title>
         <meta
           name="description"
-          content="Nifty Nanas Breeding created by MagicShards"
+          content="Get a brand new Baby Nana from two Nifty Nanas!"
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -235,7 +235,12 @@ export default function Home() {
                 <NFTSelectInput name="mint" NFTs={walletNFTs} />
               </Flex>
 
-              <Alert mb={2}>
+              <Alert
+                mb={2}
+                sx={{
+                  fontSize: "1.4rem",
+                }}
+              >
                 Your two Nifty Nanas&nbsp;<b>will</b>&nbsp;be burned to generate
                 the new Baby Nana!
               </Alert>
