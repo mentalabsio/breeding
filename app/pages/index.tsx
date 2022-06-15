@@ -437,7 +437,6 @@ export default function Home() {
           margin: "4rem 0",
         }}
       >
-        Powered by{" "}
         <a
           href="https://twitter.com/magicshards"
           target="_blank"
@@ -462,7 +461,6 @@ export default function Home() {
               alt="Magic Shards"
               height={32}
             />
-            MagicShards
           </Text>
         </a>
       </footer>

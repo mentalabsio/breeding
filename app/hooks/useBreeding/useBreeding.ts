@@ -15,15 +15,15 @@ const parentsCandyMachineAddress = new web3.PublicKey(
 )
 
 const rewardsCandyMachineAddress = new web3.PublicKey(
-  "EuhcFYpMXoDUgTKNTmBEx3gtuaMpKgMTZ5ZBztbwL32Q"
+  "GjntQcjKbmF6TD5nUvEDJxHF5StsCFAjcj3nnzb2A8Md"
 )
 
 const feeToken = new web3.PublicKey(
-  "EmNtV2uNxC8kyGXSpLi8uLfgrmiTfEUhho4aqwUZdtMZ"
+  "Eez6QJBwD9Woe2JSUQuPnGkGrKoQtaZniMbY8Xjv2kcE"
 )
 
 const programId = new web3.PublicKey(
-  "GD3hCzdGedt7MQLKCcMebGQ1suNHdZedL24KjYyH7wTG"
+  "9K6964dfAazdKsoeR7SBGSMa1t6Q4AMSm8KFCEtAMvvy"
 )
 
 const breedingMachineAuthority = new web3.PublicKey(
@@ -78,10 +78,12 @@ export const useBreeding = () => {
         programId
       )
 
-      // const whitelistToken = findWhitelistTokenAddress(
-      //   breedingMachine,
-      //   programId
-      // )
+      const whitelistToken = findWhitelistTokenAddress(
+        breedingMachine,
+        programId
+      )
+
+      console.log(whitelistToken.toString())
 
       const machineAccount = await anchorProgram.account.breedMachine.fetch(
         breedingMachine

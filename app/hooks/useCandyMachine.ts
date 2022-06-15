@@ -19,7 +19,7 @@ import { Keypair } from "@solana/web3.js"
 import { useCallback, useEffect, useState } from "react"
 
 const candyMachineId = new web3.PublicKey(
-  "FLXY9rYLLRpGW2kWd58zfY2isV1gdDDcHukGiY9L6jAu"
+  "GjntQcjKbmF6TD5nUvEDJxHF5StsCFAjcj3nnzb2A8Md"
 )
 
 export type SetupState = {
