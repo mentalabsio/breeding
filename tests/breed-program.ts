@@ -20,7 +20,7 @@ describe("breed-program", () => {
   )
 
   const rewardsCandyMachineAddress = new anchor.web3.PublicKey(
-    "EuhcFYpMXoDUgTKNTmBEx3gtuaMpKgMTZ5ZBztbwL32Q"
+    "GjntQcjKbmF6TD5nUvEDJxHF5StsCFAjcj3nnzb2A8Md"
   )
 
   const breedingMachineAuthority = anchor.web3.Keypair.fromSecretKey(

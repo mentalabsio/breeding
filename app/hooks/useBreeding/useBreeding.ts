@@ -9,6 +9,7 @@ import { createBreeding } from "@/utils/breeding"
 import { getNFTMetadata } from "@/utils/nfts"
 import { useCandyMachine } from "../useCandyMachine"
 import { Transaction } from "@solana/web3.js"
+import useV2 from "../useV2"
 
 const parentsCandyMachineAddress = new web3.PublicKey(
   "9bBjPXwFVzPSEA4BH2wFfDnzYTekQq6itf6JBNvzRW2C"
@@ -33,8 +34,7 @@ const breedingMachineAuthority = new web3.PublicKey(
 export const useBreeding = () => {
   const { connection } = useConnection()
   const anchorWallet = useAnchorWallet()
-  const { alertState, onMint, getInstructionsForSetupAccounts } =
-    useCandyMachine()
+  const { onMint } = useV2()
 
   const [anchorProgram, setAnchorProgram] = useState<Program<Idl>>(null)
   const [breedingMachineAccount, setBreedingMachineAccount] = useState(null)
@@ -337,10 +337,6 @@ export const useBreeding = () => {
 
       setFeedbackStatus("[Breed] Building instructions...")
 
-      const setupState = await getInstructionsForSetupAccounts(
-        anchorWallet.publicKey
-      )
-
       const {
         instruction: initInstruction,
         additionalInstructions: initAdditional,
@@ -373,11 +369,10 @@ export const useBreeding = () => {
       }
 
       tx.add(ixTerminate)
-      tx.add(...setupState.instructions)
 
       setFeedbackStatus("[Breed] Awaiting approval...")
 
-      const txid = await anchorProgram.provider.send(tx, [setupState.mint])
+      const txid = await anchorProgram.provider.send(tx, [])
 
       setFeedbackStatus("Confirming transaction...")
 
@@ -388,7 +383,7 @@ export const useBreeding = () => {
        */
       setFeedbackStatus("Awaiting approval to mint the new NFT...")
 
-      await onMint({ setupMint: setupState.mint })
+      await onMint()
 
       setFeedbackStatus("Refetching data...")
 

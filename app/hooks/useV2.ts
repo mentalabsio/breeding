@@ -6,9 +6,11 @@ import {
   getCandyMachineState,
   getCollectionPDA,
   mintOneToken,
+  SetupState,
 } from "@/utils/candy-machine/candy-machine"
 import { DEFAULT_TIMEOUT } from "@/utils/candy-machine/connection"
 import {
+  AlertState,
   createAssociatedTokenAccountInstruction,
   getAtaForMint,
   toDate,
@@ -20,33 +22,28 @@ import {
   Token,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token"
-import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react"
+import {
+  useAnchorWallet,
+  useConnection,
+  useWallet,
+} from "@solana/wallet-adapter-react"
 import { Commitment, Connection, Keypair, Transaction } from "@solana/web3.js"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import * as anchor from "@project-serum/anchor"
 
-const candyMachineId = new web3.PublicKey(
-  "GjntQcjKbmF6TD5nUvEDJxHF5StsCFAjcj3nnzb2A8Md"
-)
-
-export type SetupState = {
-  mint: web3.Keypair
-  userTokenAccount: web3.PublicKey
-  transaction: string
+const props = {
+  candyMachineId: new web3.PublicKey(
+    "GjntQcjKbmF6TD5nUvEDJxHF5StsCFAjcj3nnzb2A8Md"
+  ),
+  txTimeout: DEFAULT_TIMEOUT,
+  rpcHost:
+    process.env.NEXT_PUBLIC_CONNECTION_NETWORK === "devnet"
+      ? process.env.NEXT_PUBLIC_SOLANA_RPC_HOST_DEVNET
+      : process.env.NEXT_PUBLIC_SOLANA_RPC_HOST_MAINNET_BETA,
 }
-
-export interface AlertState {
-  open: boolean
-  message: string
-  severity: "success" | "info" | "warning" | "error" | undefined
-  noHide?: boolean
-}
-
-export const useCandyMachine = () => {
-  const { connection } = useConnection()
-  const anchorWallet = useAnchorWallet()
+const useV2 = () => {
   const [isUserMinting, setIsUserMinting] = useState(false)
   const [candyMachine, setCandyMachine] = useState<CandyMachineAccount>()
-
   const [alertState, setAlertState] = useState<AlertState>({
     open: false,
     message: "",
@@ -55,15 +52,33 @@ export const useCandyMachine = () => {
   const [isActive, setIsActive] = useState(false)
   const [endDate, setEndDate] = useState<Date>()
   const [itemsRemaining, setItemsRemaining] = useState<number>()
+  const [isWhitelistUser, setIsWhitelistUser] = useState(false)
   const [isPresale, setIsPresale] = useState(false)
-  const [discountPrice, setDiscountPrice] = useState<BN>()
+  const [isValidBalance, setIsValidBalance] = useState(false)
+  const [discountPrice, setDiscountPrice] = useState<anchor.BN>()
   const [needTxnSplit, setNeedTxnSplit] = useState(true)
   const [setupTxn, setSetupTxn] = useState<SetupState>()
+  const { connection } = useConnection()
 
-  const rpcHost =
-    process.env.NEXT_PUBLIC_CONNECTION_NETWORK === "devnet"
-      ? process.env.NEXT_PUBLIC_SOLANA_RPC_HOST_DEVNET
-      : process.env.NEXT_PUBLIC_SOLANA_RPC_HOST_MAINNET_BETA
+  const rpcUrl = props.rpcHost
+  const wallet = useWallet()
+
+  const anchorWallet = useMemo(() => {
+    if (
+      !wallet ||
+      !wallet.publicKey ||
+      !wallet.signAllTransactions ||
+      !wallet.signTransaction
+    ) {
+      return
+    }
+
+    return {
+      publicKey: wallet.publicKey,
+      signAllTransactions: wallet.signAllTransactions,
+      signTransaction: wallet.signTransaction,
+    } as anchor.Wallet
+  }, [wallet])
 
   const refreshCandyMachineState = useCallback(
     async (commitment: Commitment = "confirmed") => {
@@ -71,13 +86,13 @@ export const useCandyMachine = () => {
         return
       }
 
-      const connection = new Connection(rpcHost, commitment)
+      const connection = new Connection(props.rpcHost, commitment)
 
-      if (candyMachineId) {
+      if (props.candyMachineId) {
         try {
           const cndy = await getCandyMachineState(
             anchorWallet,
-            candyMachineId,
+            props.candyMachineId,
             connection
           )
           let active =
@@ -111,7 +126,7 @@ export const useCandyMachine = () => {
               }
             }
             // retrieves the whitelist token
-            const mint = new web3.PublicKey(
+            const mint = new anchor.web3.PublicKey(
               cndy.state.whitelistMintSettings.mint
             )
             const token = (await getAtaForMint(mint, anchorWallet.publicKey))[0]
@@ -120,13 +135,13 @@ export const useCandyMachine = () => {
               const balance = await connection.getTokenAccountBalance(token)
               isWLUser = parseInt(balance.value.amount) > 0
               // only whitelist the user if the balance > 0
-              // setIsWhitelistUser(isWLUser)
+              setIsWhitelistUser(isWLUser)
 
               if (cndy.state.isWhitelistOnly) {
                 active = isWLUser && (presale || active)
               }
             } catch (e) {
-              // setIsWhitelistUser(false)
+              setIsWhitelistUser(false)
               // no whitelist user, no mint
               if (cndy.state.isWhitelistOnly) {
                 active = false
@@ -141,29 +156,29 @@ export const useCandyMachine = () => {
 
           if (cndy?.state.tokenMint) {
             // retrieves the SPL token
-            const mint = new web3.PublicKey(cndy.state.tokenMint)
+            const mint = new anchor.web3.PublicKey(cndy.state.tokenMint)
             const token = (await getAtaForMint(mint, anchorWallet.publicKey))[0]
             try {
               const balance = await connection.getTokenAccountBalance(token)
 
-              const valid = new BN(balance.value.amount).gte(userPrice)
+              const valid = new anchor.BN(balance.value.amount).gte(userPrice)
 
               // only allow user to mint if token balance >  the user if the balance > 0
-              // setIsValidBalance(valid)
+              setIsValidBalance(valid)
               active = active && valid
             } catch (e) {
-              // setIsValidBalance(false)
+              setIsValidBalance(false)
               active = false
               // no whitelist user, no mint
               console.log("There was a problem fetching SPL token balance")
               console.log(e)
             }
           } else {
-            const balance = new BN(
+            const balance = new anchor.BN(
               await connection.getBalance(anchorWallet.publicKey)
             )
             const valid = balance.gte(userPrice)
-            // setIsValidBalance(valid)
+            setIsValidBalance(valid)
             active = active && valid
           }
 
@@ -197,7 +212,7 @@ export const useCandyMachine = () => {
             active = false
           }
 
-          const [collectionPDA] = await getCollectionPDA(candyMachineId)
+          const [collectionPDA] = await getCollectionPDA(props.candyMachineId)
           const collectionPDAAccount = await connection.getAccountInfo(
             collectionPDA
           )
@@ -218,19 +233,23 @@ export const useCandyMachine = () => {
           setNeedTxnSplit(txnEstimate > 1230)
         } catch (e) {
           if (e instanceof Error) {
-            if (e.message === `Account does not exist ${candyMachineId}`) {
+            if (
+              e.message === `Account does not exist ${props.candyMachineId}`
+            ) {
               setAlertState({
                 open: true,
-                message: `Couldn't fetch candy machine state from candy machine with address: ${candyMachineId}, using rpc: ${rpcHost}! You probably typed the REACT_APP_CANDY_MACHINE_ID value in wrong in your .env file, or you are using the wrong RPC!`,
+                message: `Couldn't fetch candy machine state from candy machine with address: ${props.candyMachineId}, using rpc: ${props.rpcHost}! You probably typed the REACT_APP_CANDY_MACHINE_ID value in wrong in your .env file, or you are using the wrong RPC!`,
                 severity: "error",
+                hideDuration: null,
               })
             } else if (
               e.message.startsWith("failed to get info about account")
             ) {
               setAlertState({
                 open: true,
-                message: `Couldn't fetch candy machine state with rpc: ${rpcHost}! This probably means you have an issue with the REACT_APP_SOLANA_RPC_HOST value in your .env file, or you are not using a custom RPC!`,
+                message: `Couldn't fetch candy machine state with rpc: ${props.rpcHost}! This probably means you have an issue with the REACT_APP_SOLANA_RPC_HOST value in your .env file, or you are not using a custom RPC!`,
                 severity: "error",
+                hideDuration: null,
               })
             }
           } else {
@@ -238,6 +257,7 @@ export const useCandyMachine = () => {
               open: true,
               message: `${e}`,
               severity: "error",
+              hideDuration: null,
             })
           }
           console.log(e)
@@ -247,24 +267,12 @@ export const useCandyMachine = () => {
           open: true,
           message: `Your REACT_APP_CANDY_MACHINE_ID value in the .env file doesn't look right! Make sure you enter it in as plain base-58 address!`,
           severity: "error",
+          hideDuration: null,
         })
       }
     },
-    [anchorWallet, candyMachineId, rpcHost]
+    [anchorWallet, props.candyMachineId, props.rpcHost]
   )
-
-  useEffect(() => {
-    refreshCandyMachineState()
-  }, [anchorWallet, candyMachineId, connection, refreshCandyMachineState])
-
-  useEffect(() => {
-    ;(function loop() {
-      setTimeout(() => {
-        refreshCandyMachineState()
-        loop()
-      }, 20000)
-    })()
-  }, [refreshCandyMachineState])
 
   const onMint = async (
     beforeTransactions: Transaction[] = [],
@@ -273,7 +281,7 @@ export const useCandyMachine = () => {
     try {
       setIsUserMinting(true)
       document.getElementById("#identity")?.click()
-      if (candyMachine?.program && anchorWallet.publicKey) {
+      if (wallet.connected && candyMachine?.program && wallet.publicKey) {
         let setupMint: SetupState | undefined
         if (needTxnSplit && setupTxn === undefined) {
           setAlertState({
@@ -283,13 +291,13 @@ export const useCandyMachine = () => {
           })
           setupMint = await createAccountsForMint(
             candyMachine,
-            anchorWallet.publicKey
+            wallet.publicKey
           )
           let status: any = { err: true }
           if (setupMint.transaction) {
             status = await awaitTransactionSignatureConfirmation(
               setupMint.transaction,
-              DEFAULT_TIMEOUT,
+              props.txTimeout,
               connection,
               true
             )
@@ -321,7 +329,7 @@ export const useCandyMachine = () => {
 
         let mintResult = await mintOneToken(
           candyMachine,
-          anchorWallet.publicKey,
+          wallet.publicKey,
           beforeTransactions,
           afterTransactions,
           setupMint ?? setupTxn
@@ -332,7 +340,7 @@ export const useCandyMachine = () => {
         if (mintResult) {
           status = await awaitTransactionSignatureConfirmation(
             mintResult.mintTxId,
-            DEFAULT_TIMEOUT,
+            props.txTimeout,
             connection,
             true
           )
@@ -357,6 +365,7 @@ export const useCandyMachine = () => {
             open: true,
             message: "Congratulations! Mint succeeded!",
             severity: "success",
+            hideDuration: 7000,
           })
           refreshCandyMachineState("processed")
         } else if (status && !status.err) {
@@ -365,6 +374,7 @@ export const useCandyMachine = () => {
             message:
               "Mint likely failed! Anti-bot SOL 0.01 fee potentially charged! Check the explorer to confirm the mint failed and if so, make sure you are eligible to mint before trying again.",
             severity: "error",
+            hideDuration: 8000,
           })
           refreshCandyMachineState()
         } else {
@@ -385,7 +395,7 @@ export const useCandyMachine = () => {
           console.log(error)
           message = `SOLD OUT!`
         } else if (error.message.indexOf("0x135")) {
-          message = `Insufficient funds to mint. Please fund your anchorWallet.`
+          message = `Insufficient funds to mint. Please fund your wallet.`
         }
       } else {
         if (error.code === 311) {
@@ -410,9 +420,44 @@ export const useCandyMachine = () => {
     }
   }
 
+  const toggleMintButton = () => {
+    let active = !isActive || isPresale
+
+    if (active) {
+      if (candyMachine!.state.isWhitelistOnly && !isWhitelistUser) {
+        active = false
+      }
+      if (endDate && Date.now() >= endDate.getTime()) {
+        active = false
+      }
+    }
+
+    if (
+      isPresale &&
+      candyMachine!.state.goLiveDate &&
+      candyMachine!.state.goLiveDate.toNumber() <= new Date().getTime() / 1000
+    ) {
+      setIsPresale((candyMachine!.state.isPresale = false))
+    }
+
+    setIsActive((candyMachine!.state.isActive = active))
+  }
+
+  useEffect(() => {
+    refreshCandyMachineState()
+  }, [anchorWallet, props.candyMachineId, connection, refreshCandyMachineState])
+
+  useEffect(() => {
+    ;(function loop() {
+      setTimeout(() => {
+        refreshCandyMachineState()
+        loop()
+      }, 20000)
+    })()
+  }, [refreshCandyMachineState])
+
   return {
     onMint,
-    candyMachine,
-    alertState,
   }
 }
+export default useV2
