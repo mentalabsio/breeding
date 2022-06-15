@@ -7,14 +7,9 @@ import {
   getCollectionPDA,
   mintOneToken,
   SetupState,
-} from "@/utils/candy-machine/candy-machine"
-import { DEFAULT_TIMEOUT } from "@/utils/candy-machine/connection"
-import {
-  AlertState,
-  createAssociatedTokenAccountInstruction,
-  getAtaForMint,
-  toDate,
-} from "@/utils/candy-machine/mint"
+} from "../lib/candy-machine"
+import { DEFAULT_TIMEOUT } from "../lib/connection"
+import { AlertState, getAtaForMint, toDate } from "../lib/utils"
 import { web3, BN } from "@project-serum/anchor"
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -62,7 +57,6 @@ const useV2 = () => {
 
   const rpcUrl = props.rpcHost
   const wallet = useWallet()
-
   const anchorWallet = useMemo(() => {
     if (
       !wallet ||
@@ -455,7 +449,6 @@ const useV2 = () => {
       }, 20000)
     })()
   }, [refreshCandyMachineState])
-
   return {
     onMint,
   }

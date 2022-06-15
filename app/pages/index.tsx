@@ -420,7 +420,7 @@ export default function Home() {
               }}
             >
               <Text variant="small">stuck?</Text>
-              <Button variant="resetted" onClick={() => onMint({})}>
+              <Button variant="resetted" onClick={() => onMint()}>
                 click here
               </Button>{" "}
               <Text variant="xsmall">to mint manually</Text>
