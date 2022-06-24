@@ -8,7 +8,7 @@ import { useBreeding } from "@/hooks/useBreeding/useBreeding"
 import useWalletNFTs from "@/hooks/useWalletNFTs"
 import { web3 } from "@project-serum/anchor"
 import { useAnchorWallet } from "@solana/wallet-adapter-react"
-import { Button, Flex, Heading, Text } from "@theme-ui/components"
+import { Button, Flex, Heading, Text, Alert } from "@theme-ui/components"
 import Head from "next/head"
 import { useEffect } from "react"
 
@@ -18,7 +18,7 @@ export default function Home() {
     "9bBjPXwFVzPSEA4BH2wFfDnzYTekQq6itf6JBNvzRW2C",
   ])
   const {
-    initializeBreeding,
+    initializeAndTerminateBreeding,
     terminateBreeding,
     onMint,
     breedingMachineAccount,
@@ -52,8 +52,11 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Breeding UI</title>
-        <meta name="description" content="Breeding UI created by MagicShards" />
+        <title>Propagate your Nifty Nanas</title>
+        <meta
+          name="description"
+          content="Get a brand new Baby Nana from two Nifty Nanas!"
+        />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -65,24 +68,79 @@ export default function Home() {
           justifyContent: "center",
           alignItems: "center",
           maxWidth: "78rem",
-          margin: "4rem auto",
+          margin: "0 auto",
           padding: "0 1.6rem",
         }}
       >
         <Flex
           sx={{
-            flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            background: (props) => props.colors.backgroundGradient,
+            background: (props) => props.colors.background,
             alignSelf: "stretch",
             padding: "1.6rem 0",
+            margin: "3.2rem 0",
+            gap: "3.2rem",
+
+            flexDirection: "column",
+
+            "@media (min-width: 768px)": {
+              flexDirection: "row",
+            },
           }}
         >
-          <Heading mb=".8rem" variant="heading1">
-            Breeding
-          </Heading>
-          <Text>Generate a new NFT from two!</Text>
+          <Flex
+            sx={{
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Heading
+              sx={{
+                letterSpacing: "-2px",
+                textShadow: "0 3px 12px rgb(0 0 0 / 13%)",
+                fontSize: "4rem",
+
+                // "-webkit-background-clip": "text",
+
+                // "-webkit-text-fill-color": "transparent",
+                backgroundImage: (props) => props.colors.primaryGradient2,
+                backgroundClip: "text",
+                color: "transparent",
+                // background: (props) => props.colors.primaryGradient,
+              }}
+              mb=".8rem"
+              variant="heading1"
+            >
+              Propagate your Nanas
+            </Heading>
+            <Text>Get a brand new Baby Nana from two Nifty Nanas!</Text>
+          </Flex>
+
+          <Flex
+            sx={{
+              alignItems: "center",
+              gap: ".8rem",
+            }}
+          >
+            {/* <img
+              sx={{
+                maxWidth: "24rem",
+              }}
+              src="/babynana1.png"
+              alt="Baby Nana"
+              title="Baby Nana"
+            /> */}
+            <img
+              sx={{
+                maxWidth: "16rem",
+              }}
+              src="/babynana2.png"
+              alt="Baby Nana"
+              title="Baby Nana"
+            />
+          </Flex>
         </Flex>
         {/* 
         <Button onClick={initializeBreedingMachine}>initialize</Button> */}
@@ -120,7 +178,9 @@ export default function Home() {
               alignItems: "center",
             }}
           >
-            <Heading variant="heading2">Select two NFTs to breed:</Heading>
+            <Heading variant="heading2">
+              Select two Nifty Nanas to propagate:
+            </Heading>
 
             <form
               onSubmit={async (e) => {
@@ -133,7 +193,7 @@ export default function Home() {
 
                 if (mints.length !== 2) return true
 
-                const res = await initializeBreeding(
+                const res = await initializeAndTerminateBreeding(
                   new web3.PublicKey(mints[0]),
                   new web3.PublicKey(mints[1])
                 )
@@ -147,6 +207,7 @@ export default function Home() {
                 flexDirection: "column",
                 alignItems: "center",
                 gap: "3.2rem",
+                margin: "1.6rem 0",
               }}
             >
               <Flex
@@ -173,6 +234,17 @@ export default function Home() {
 
                 <NFTSelectInput name="mint" NFTs={walletNFTs} />
               </Flex>
+
+              <Alert
+                mb={2}
+                sx={{
+                  fontSize: "1.4rem",
+                }}
+              >
+                Your two Nifty Nanas&nbsp;<b>will</b>&nbsp;be burned to generate
+                the new Baby Nana!
+              </Alert>
+
               <Flex
                 sx={{
                   flexDirection: "column",
@@ -194,7 +266,7 @@ export default function Home() {
                   }}
                   type="submit"
                 >
-                  breed!
+                  propagate!
                 </Button>
                 <Flex
                   sx={{
@@ -223,32 +295,10 @@ export default function Home() {
               </Flex>
             </form>
 
-            <Heading variant="heading2" mt="4.8rem" mb=".8rem">
+            {/* <Heading variant="heading2" mt="4.8rem" mb=".8rem">
               Your current breedings
             </Heading>
-            {/* <Flex
-              sx={{
-                alignItems: "center",
-                gap: ".8rem",
-                margin: "1.6rem 0",
-              }}
-            >
-              {alertState.message && (
-                <>
-                  {alertState.severity !== "success" && <LoadingIcon />}
 
-                  <Text
-                    sx={{
-                      color:
-                        alertState.severity === "success" ? "success" : "text",
-                    }}
-                  >
-                    {alertState.message}
-                  </Text>
-                </>
-              )}{" "}
-              &nbsp;
-            </Flex> */}
             <Flex
               sx={{
                 flexDirection: "column",
@@ -301,7 +351,7 @@ export default function Home() {
                                 breedData.metadatas[0].externalMetadata.image
                               }
                               sx={{
-                                maxHeight: "3.2rem",
+                                maxHeight: "6.4rem",
                               }}
                             />
                             {breedData.metadatas[0].externalMetadata.name}
@@ -325,7 +375,7 @@ export default function Home() {
                                 breedData.metadatas[1].externalMetadata.image
                               }
                               sx={{
-                                maxHeight: "3.2rem",
+                                maxHeight: "6.4rem",
                               }}
                             />
                             {breedData.metadatas[1].externalMetadata.name}
@@ -358,7 +408,7 @@ export default function Home() {
               ) : (
                 <Text>Connect your wallet first.</Text>
               )}
-            </Flex>
+            </Flex> */}
 
             {/* <Text
               variant="small"
@@ -369,7 +419,8 @@ export default function Home() {
                 margin: "1.6rem 0",
               }}
             >
-              <Button variant="resetted" onClick={onMint}>
+              <Text variant="small">stuck?</Text>
+              <Button variant="resetted" onClick={() => onMint()}>
                 click here
               </Button>{" "}
               <Text variant="xsmall">to mint manually</Text>
@@ -386,7 +437,6 @@ export default function Home() {
           margin: "4rem 0",
         }}
       >
-        Powered by{" "}
         <a
           href="https://twitter.com/magicshards"
           target="_blank"
@@ -411,7 +461,6 @@ export default function Home() {
               alt="Magic Shards"
               height={32}
             />
-            MagicShards
           </Text>
         </a>
       </footer>

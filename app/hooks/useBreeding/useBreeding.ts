@@ -6,23 +6,23 @@ import {
   findWhitelistTokenAddress,
 } from "@/utils/breeding"
 import { createBreeding } from "@/utils/breeding"
-import { getNFTMetadata } from "@/utils/nfts"
-import { useCandyMachine } from "../useCandyMachine"
+import { Transaction } from "@solana/web3.js"
+import useV2 from "../useV2"
 
 const parentsCandyMachineAddress = new web3.PublicKey(
   "9bBjPXwFVzPSEA4BH2wFfDnzYTekQq6itf6JBNvzRW2C"
 )
 
 const rewardsCandyMachineAddress = new web3.PublicKey(
-  "EuhcFYpMXoDUgTKNTmBEx3gtuaMpKgMTZ5ZBztbwL32Q"
+  "EGn8t9XWhhbqMRxg6XzLDuEJ599icqauGFUKoXQ2cCMj"
 )
 
 const feeToken = new web3.PublicKey(
-  "EmNtV2uNxC8kyGXSpLi8uLfgrmiTfEUhho4aqwUZdtMZ"
+  "Eez6QJBwD9Woe2JSUQuPnGkGrKoQtaZniMbY8Xjv2kcE"
 )
 
 const programId = new web3.PublicKey(
-  "GD3hCzdGedt7MQLKCcMebGQ1suNHdZedL24KjYyH7wTG"
+  "9K6964dfAazdKsoeR7SBGSMa1t6Q4AMSm8KFCEtAMvvy"
 )
 
 const breedingMachineAuthority = new web3.PublicKey(
@@ -32,8 +32,7 @@ const breedingMachineAuthority = new web3.PublicKey(
 export const useBreeding = () => {
   const { connection } = useConnection()
   const anchorWallet = useAnchorWallet()
-  const { alertState, onMint, getInstructionsForSetupAccounts } =
-    useCandyMachine()
+  const { onMint } = useV2()
 
   const [anchorProgram, setAnchorProgram] = useState<Program<Idl>>(null)
   const [breedingMachineAccount, setBreedingMachineAccount] = useState(null)
@@ -77,10 +76,12 @@ export const useBreeding = () => {
         programId
       )
 
-      // const whitelistToken = findWhitelistTokenAddress(
-      //   breedingMachine,
-      //   programId
-      // )
+      const whitelistToken = findWhitelistTokenAddress(
+        breedingMachine,
+        programId
+      )
+
+      console.log(whitelistToken.toString())
 
       const machineAccount = await anchorProgram.account.breedMachine.fetch(
         breedingMachine
@@ -101,9 +102,9 @@ export const useBreeding = () => {
       console.error("Couldn't fetch machine!" + e)
     }
 
-    setFeedbackStatus("Fetching user data...")
-    /** Fetch all program accounts */
-    const programAccs = await connection.getProgramAccounts(programId)
+    // setFeedbackStatus("Fetching user data...")
+    // /** Fetch all program accounts */
+    // const programAccs = await connection.getProgramAccounts(programId)
 
     // try {
     //   const multiple = await anchorProgram.account.breedData.fetchMultiple(
@@ -116,43 +117,43 @@ export const useBreeding = () => {
     // }
 
     /** Get user breed datas */
-    const userBreedDatasPromises = programAccs.map(async (acc) => {
-      try {
-        /** Try to fetch breed data account using the program account address */
-        const breedData = await anchorProgram.account.breedData.fetch(
-          acc.pubkey
-        )
+    // const userBreedDatasPromises = programAccs.map(async (acc) => {
+    //   try {
+    //     /** Try to fetch breed data account using the program account address */
+    //     const breedData = await anchorProgram.account.breedData.fetch(
+    //       acc.pubkey
+    //     )
 
-        /** Return if the user wallet is the owner */
-        if (breedData.owner.toString() === anchorWallet.publicKey.toString()) {
-          return breedData
-        }
+    //     /** Return if the user wallet is the owner */
+    //     if (breedData.owner.toString() === anchorWallet.publicKey.toString()) {
+    //       return breedData
+    //     }
 
-        return null
-        /** Error will be throwed if discriminator is invalid (not a breedData account) */
-      } catch (e) {
-        return null
-      }
-    })
+    //     return null
+    //     /** Error will be throwed if discriminator is invalid (not a breedData account) */
+    //   } catch (e) {
+    //     return null
+    //   }
+    // })
 
-    const breedDatas = (await Promise.all(userBreedDatasPromises)).filter(
-      (value) => value !== null
-    )
+    // const breedDatas = (await Promise.all(userBreedDatasPromises)).filter(
+    //   (value) => value !== null
+    // )
 
-    const withNFTs = breedDatas.map(async (breedData) => {
-      const metadatas = await Promise.all([
-        getNFTMetadata(breedData.mintA, connection),
-        getNFTMetadata(breedData.mintB, connection),
-      ])
+    // const withNFTs = breedDatas.map(async (breedData) => {
+    //   const metadatas = await Promise.all([
+    //     getNFTMetadata(breedData.mintA, connection),
+    //     getNFTMetadata(breedData.mintB, connection),
+    //   ])
 
-      return { breedData, metadatas }
-    })
+    //   return { breedData, metadatas }
+    // })
 
-    const breedDatasWithNFTs = (await Promise.all(withNFTs)).filter(
-      (value) => value !== null
-    )
+    // const breedDatasWithNFTs = (await Promise.all(withNFTs)).filter(
+    //   (value) => value !== null
+    // )
 
-    setUserBreedDatas(breedDatasWithNFTs)
+    // setUserBreedDatas(breedDatasWithNFTs)
     setFeedbackStatus("")
   }, [connection, anchorWallet])
 
@@ -281,27 +282,106 @@ export const useBreeding = () => {
 
       setFeedbackStatus("Terminating...")
 
-      const setupState = await getInstructionsForSetupAccounts(
-        anchorWallet.publicKey
+      const { tx } = await terminate(mintParentA, mintParentB)
+
+      setFeedbackStatus("[Breed] Confirming transaction...")
+
+      await connection.confirmTransaction(tx, "confirmed")
+
+      setFeedbackStatus("[Breed] Refetching data...")
+
+      await fetchData()
+
+      setFeedbackStatus("Success!")
+
+      setTimeout(() => {
+        setFeedbackStatus("")
+      }, 6000)
+    } catch (e) {
+      console.log(e)
+
+      setFeedbackStatus("Something went wrong. " + e + "")
+
+      setTimeout(() => {
+        fetchData()
+      }, 6000)
+    }
+  }
+
+  const initializeAndTerminateBreeding = async (
+    mintParentA: web3.PublicKey,
+    mintParentB: web3.PublicKey
+  ) => {
+    try {
+      if (!anchorProgram) throw new Error("Anchor program is not initialized.")
+
+      if (!mintParentA || !mintParentB)
+        throw new Error("Mint addresses are missing.")
+
+      const breedingMachine = findBreedingMachineAddress(
+        parentsCandyMachineAddress,
+        rewardsCandyMachineAddress,
+        /** Authority pubkey */
+        breedingMachineAuthority,
+        programId
       )
 
-      const { tx } = await terminate(
-        mintParentA,
-        mintParentB,
-        [setupState.mint],
-        setupState.instructions
+      const { getInitInstruction, getTerminateInstruction } = createBreeding(
+        connection,
+        anchorProgram,
+        breedingMachine,
+        anchorWallet
       )
+
+      setFeedbackStatus("[Breed] Building instructions...")
+
+      const {
+        instruction: initInstruction,
+        additionalInstructions: initAdditional,
+      } = await getInitInstruction(mintParentA, mintParentB)
+
+      const ixInit = await initInstruction.instruction()
+
+      const {
+        instruction: terminateInstruction,
+        additionalInstructions: terminateAdditional,
+      } = await getTerminateInstruction(mintParentA, mintParentB)
+
+      const ixTerminate = await terminateInstruction.instruction()
+
+      const latest = await connection.getLatestBlockhash()
+
+      const tx = new Transaction({
+        feePayer: anchorWallet.publicKey,
+        recentBlockhash: latest.blockhash,
+      })
+
+      if (initAdditional.length) {
+        tx.add(...initAdditional)
+      }
+
+      tx.add(ixInit)
+
+      if (terminateAdditional.length) {
+        tx.add(...terminateAdditional)
+      }
+
+      tx.add(ixTerminate)
+
+      setFeedbackStatus("[Breed] Awaiting approval...")
+
+      const txid = await anchorProgram.provider.send(tx, [])
 
       setFeedbackStatus("Confirming transaction...")
 
-      await connection.confirmTransaction(tx, "confirmed")
+      await connection.confirmTransaction(txid, "confirmed")
 
       /**
        * @TODO MUST REMOVE the mint from here if there is locktime
        */
       setFeedbackStatus("Awaiting approval to mint the new NFT...")
 
-      await onMint({ setupMint: setupState.mint })
+      await onMint()
 
       setFeedbackStatus("Refetching data...")
 
@@ -327,6 +407,7 @@ export const useBreeding = () => {
     initializeBreeding,
     terminateBreeding,
     initializeBreedingMachine,
+    initializeAndTerminateBreeding,
     onMint,
     breedingMachineAccount,
     userBreedDatas,

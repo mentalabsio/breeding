@@ -2,16 +2,16 @@
 seeds = false
 
 [programs.devnet]
-breed_program = "GD3hCzdGedt7MQLKCcMebGQ1suNHdZedL24KjYyH7wTG"
+breed_program = "9K6964dfAazdKsoeR7SBGSMa1t6Q4AMSm8KFCEtAMvvy"
 [programs.localnet]
-breed_program = "GD3hCzdGedt7MQLKCcMebGQ1suNHdZedL24KjYyH7wTG"
+breed_program = "9K6964dfAazdKsoeR7SBGSMa1t6Q4AMSm8KFCEtAMvvy"
 
 [registry]
 url = "https://anchor.projectserum.com"
 
 [provider]
-cluster = "https://psytrbhymqlkfrhudd.dev.genesysgo.net:8899/"
-wallet = "~/.config/solana/viv.json"
+cluster = "https://devnet.genesysgo.net/"
+wallet = "~/.config/solana/mainnet_ms.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
@@ -48,7 +48,4 @@ address = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
 
 
 
-# program idl for address GD3hCzdGedt7MQLKCcMebGQ1suNHdZedL24KjYyH7wTG
-[[test.validator.clone]]
-address = "59xs2cXMT7ttKDcU5b6Bt6RKX21FJEa1TiUrrDJ6Ti5P"
 

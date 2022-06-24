@@ -8,3 +8,15 @@
   src: url("/fonts/AvertaStdBold/font.woff2") format("woff2"),
     url("/fonts/AvertaStdBold/font.woff") format("woff");
 }
+
+@font-face {
+  font-family: "SatoshiRegular";
+  src: url("/fonts/Satoshi/Satoshi-Regular.woff2") format("woff2"),
+    url("/fonts/Satoshi/Satoshi-Regular.woff2") format("woff");
+}
+
+@font-face {
+  font-family: "SatoshiBold";
+  src: url("/fonts/Satoshi/Satoshi-Bold.woff2") format("woff2"),
+    url("/fonts/Satoshi/Satoshi-Bold.woff2") format("woff");
+}

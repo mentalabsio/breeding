@@ -7,20 +7,23 @@ import {
   findBreedingMachineAddress,
   findWhitelistTokenAddress,
 } from "../app/utils/breeding"
-import { BreedProgram } from "../target/types/breed_program"
+import { BreedProgram, IDL } from "../target/types/breed_program"
 
 describe("breed-program", () => {
   // Configure the client to use the local cluster.
-  anchor.setProvider(anchor.Provider.env())
+  anchor.setProvider(anchor.AnchorProvider.env())
 
-  const program = anchor.workspace.BreedProgram as Program<BreedProgram>
+  const program = new Program(
+    IDL,
+    new anchor.web3.PublicKey("9K6964dfAazdKsoeR7SBGSMa1t6Q4AMSm8KFCEtAMvvy")
+  )
 
   const parentsCandyMachineAddress = new anchor.web3.PublicKey(
     "9bBjPXwFVzPSEA4BH2wFfDnzYTekQq6itf6JBNvzRW2C"
   )
 
   const rewardsCandyMachineAddress = new anchor.web3.PublicKey(
-    "GjntQcjKbmF6TD5nUvEDJxHF5StsCFAjcj3nnzb2A8Md"
+    "EGn8t9XWhhbqMRxg6XzLDuEJ599icqauGFUKoXQ2cCMj"
   )
 
   const breedingMachineAuthority = anchor.web3.Keypair.fromSecretKey(
@@ -67,12 +70,12 @@ describe("breed-program", () => {
 
   it("should be able to create a new breeding machine", async () => {
     const config = {
-      burnParents: false,
+      burnParents: true,
       /** breedingTime in seconds */
-      breedingTime: new anchor.BN(2),
-      rewardSupply: new anchor.BN(3333),
+      breedingTime: new anchor.BN(0),
+      rewardSupply: new anchor.BN(2222),
       initializationFeeToken: feeToken,
-      initializationFeePrice: new anchor.BN(1),
+      initializationFeePrice: new anchor.BN(1000),
       rewardCandyMachine: rewardsCandyMachineAddress,
       parentsCandyMachine: parentsCandyMachineAddress,
     }
@@ -112,7 +115,7 @@ describe("breed-program", () => {
     expect(machineAccount.bred.toNumber()).to.equal(0)
   })
 
-  it("should be able to update a machine's config", async () => {
+  it.skip("should be able to update a machine's config", async () => {
     const newPrice = new anchor.BN(1234)
 
     const tx = await program.methods
@@ -139,7 +142,7 @@ describe("breed-program", () => {
     )
   })
 
-  it("should be able to initialize a breeding", async () => {
+  it.skip("should be able to initialize a breeding", async () => {
     const {
       tx,
       userAtaParentA,
@@ -168,7 +171,7 @@ describe("breed-program", () => {
     expect(breedMintBBalance.value.uiAmount).to.equal(1)
   })
 
-  it("should be able to terminate a breeding", async () => {
+  it.skip("should be able to terminate a breeding", async () => {
     const { tx, breedData, userWhitelistAta, userAtaParentB, userAtaParentA } =
       await terminate(mintParentA, mintParentB, [userWallet])
 
@@ -198,7 +201,7 @@ describe("breed-program", () => {
     expect(userWhitelistTokenBalance.value.uiAmount).to.greaterThanOrEqual(1)
   })
 
-  it("should be able to cancel a breeding", async () => {
+  it.skip("should be able to cancel a breeding", async () => {
     await init(mintParentA, mintParentB, [userWallet])
 
     const { tx, breedData, userAtaParentB, userAtaParentA } = await cancel(

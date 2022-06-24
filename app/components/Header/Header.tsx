@@ -1,13 +1,13 @@
 /** @jsxImportSource theme-ui */
-import WalletManager from "@/components/WalletManager/WalletManager";
-import { Button, Container, Flex, Text } from "@theme-ui/components";
-import Link from "next/link";
-import { useState } from "react";
+import WalletManager from "@/components/WalletManager/WalletManager"
+import { Button, Container, Flex, Text } from "@theme-ui/components"
+import Link from "next/link"
+import { useState } from "react"
 
-import { CloseIcon, MenuIcon } from "../icons";
+import { CloseIcon, MenuIcon } from "../icons"
 
 const Header = () => {
-  const [isMobileMenuActive, setIsMobileMenuActive] = useState(false);
+  const [isMobileMenuActive, setIsMobileMenuActive] = useState(false)
 
   return (
     <Flex
@@ -15,7 +15,7 @@ const Header = () => {
         position: "sticky",
         top: 0,
         zIndex: 9,
-        background: (theme) => theme.colors?.backgroundGradient,
+        background: (theme) => theme.colors?.background,
         borderBottom: "1px solid",
         borderColor: "background2",
       }}
@@ -32,9 +32,16 @@ const Header = () => {
           <Link href="/" passHref>
             <Flex as="a" sx={{ alignItems: "center", flexDirection: "column" }}>
               <Flex sx={{ alignItems: "center" }}>
-                <Text as="h1" variant="headingSpecial" ml=".4rem">
-                  Solana Web App
-                </Text>
+                <img
+                  sx={{
+                    maxWidth: "8rem",
+                  }}
+                  src="/nanas-logo.png"
+                />
+                {/* <Text as="h1" variant="heading3" ml=".8rem">
+                  {" "}
+                  Breeding
+                </Text> */}
               </Flex>
             </Flex>
           </Link>
@@ -130,7 +137,7 @@ const Header = () => {
         </Flex>
       </Container>
     </Flex>
-  );
-};
+  )
+}
 
-export default Header;
+export default Header

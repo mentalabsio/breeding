@@ -2,7 +2,7 @@
 
 ## Deploys
 
-- Devnet: `GD3hCzdGedt7MQLKCcMebGQ1suNHdZedL24KjYyH7wTG`
+- Devnet: `9K6964dfAazdKsoeR7SBGSMa1t6Q4AMSm8KFCEtAMvvy`
 
 ## IDL Account
 
