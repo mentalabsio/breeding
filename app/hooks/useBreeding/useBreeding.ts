@@ -6,8 +6,6 @@ import {
   findWhitelistTokenAddress,
 } from "@/utils/breeding"
 import { createBreeding } from "@/utils/breeding"
-import { getNFTMetadata } from "@/utils/nfts"
-import { useCandyMachine } from "../useCandyMachine"
 import { Transaction } from "@solana/web3.js"
 import useV2 from "../useV2"
 
@@ -16,7 +14,7 @@ const parentsCandyMachineAddress = new web3.PublicKey(
 )
 
 const rewardsCandyMachineAddress = new web3.PublicKey(
-  "GjntQcjKbmF6TD5nUvEDJxHF5StsCFAjcj3nnzb2A8Md"
+  "EGn8t9XWhhbqMRxg6XzLDuEJ599icqauGFUKoXQ2cCMj"
 )
 
 const feeToken = new web3.PublicKey(
