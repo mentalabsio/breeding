@@ -11,7 +11,7 @@ import { BreedProgram, IDL } from "../target/types/breed_program"
 
 describe("breed-program", () => {
   // Configure the client to use the local cluster.
-  anchor.setProvider(anchor.AnchorProvider.env())
+  anchor.setProvider(anchor.Provider.env())
 
   const program = new Program(
     IDL,
