@@ -512,17 +512,13 @@ export const mintOneToken = async (
   )
 
   const [collectionPDA] = await getCollectionPDA(candyMachineAddress)
-  const collectionPDAAccount =
-    await candyMachine.program.provider.connection.getAccountInfo(collectionPDA)
 
-  if (collectionPDAAccount && candyMachine.state.retainAuthority) {
+  if (candyMachine.state.retainAuthority) {
     try {
-      const collectionData =
-        (await candyMachine.program.account.collectionPda.fetch(
-          collectionPDA
-        )) as CollectionData
-      console.log(collectionData)
-      const collectionMint = collectionData.mint
+      const collectionMint = new anchor.web3.PublicKey(
+        "6psuttDQ4BtSswwKvFUBe8xqcQXeMFt4cSAQEsXJMWVr"
+      )
+
       const collectionAuthorityRecord = await getCollectionAuthorityRecordPDA(
         collectionMint,
         collectionPDA

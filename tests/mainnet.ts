@@ -11,7 +11,7 @@ import { BreedProgram, IDL } from "../target/types/breed_program"
 
 describe("breed-program", () => {
   // Configure the client to use the local cluster.
-  anchor.setProvider(anchor.Provider.env())
+  anchor.setProvider(anchor.AnchorProvider.env())
 
   const program = new Program(
     IDL,
@@ -23,7 +23,7 @@ describe("breed-program", () => {
   )
 
   const rewardsCandyMachineAddress = new anchor.web3.PublicKey(
-    "EGn8t9XWhhbqMRxg6XzLDuEJ599icqauGFUKoXQ2cCMj"
+    "8VcKE18WYYJyGZBDE8xWoKPNun3jQK3awGRBYc55MLV4"
   )
 
   const breedingMachineAuthority = anchor.web3.Keypair.fromSecretKey(
@@ -70,10 +70,10 @@ describe("breed-program", () => {
 
   it("should be able to create a new breeding machine", async () => {
     const config = {
-      burnParents: true,
+      burnParents: false,
       /** breedingTime in seconds */
       breedingTime: new anchor.BN(0),
-      rewardSupply: new anchor.BN(2222),
+      rewardSupply: new anchor.BN(10),
       initializationFeeToken: feeToken,
       initializationFeePrice: new anchor.BN(1000),
       rewardCandyMachine: rewardsCandyMachineAddress,
