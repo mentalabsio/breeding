@@ -14,7 +14,7 @@ cluster = "https://devnet.genesysgo.net/"
 wallet = "~/.config/solana/mainnet_ms.json"
 
 [scripts]
-test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/mainnet.ts"
 
 [test]
 startup_wait = 20000

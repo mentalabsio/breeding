@@ -14,7 +14,7 @@ const parentsCandyMachineAddress = new web3.PublicKey(
 )
 
 const rewardsCandyMachineAddress = new web3.PublicKey(
-  "EGn8t9XWhhbqMRxg6XzLDuEJ599icqauGFUKoXQ2cCMj"
+  "8VcKE18WYYJyGZBDE8xWoKPNun3jQK3awGRBYc55MLV4"
 )
 
 const feeToken = new web3.PublicKey(

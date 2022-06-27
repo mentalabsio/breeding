@@ -523,7 +523,6 @@ export const mintOneToken = async (
         collectionMint,
         collectionPDA
       )
-      console.log(collectionMint)
       if (collectionMint) {
         const collectionMetadata = await getMetadata(collectionMint)
         const collectionMasterEdition = await getMasterEdition(collectionMint)

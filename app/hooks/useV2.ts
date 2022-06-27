@@ -28,7 +28,7 @@ import * as anchor from "@project-serum/anchor"
 
 const props = {
   candyMachineId: new web3.PublicKey(
-    "GjntQcjKbmF6TD5nUvEDJxHF5StsCFAjcj3nnzb2A8Md"
+    "8VcKE18WYYJyGZBDE8xWoKPNun3jQK3awGRBYc55MLV4"
   ),
   txTimeout: DEFAULT_TIMEOUT,
   rpcHost:
