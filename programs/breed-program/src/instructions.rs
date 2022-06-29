@@ -252,10 +252,10 @@ pub struct FinalizeBreeding<'info> {
     )]
     pub breed_data: Account<'info, BreedData>,
 
-    #[account(address = breed_data.mint_a)]
+    #[account(mut, address = breed_data.mint_a)]
     pub mint_parent_a: Account<'info, Mint>,
 
-    #[account(address = breed_data.mint_b)]
+    #[account(mut, address = breed_data.mint_b)]
     pub mint_parent_b: Account<'info, Mint>,
 
     #[account(
