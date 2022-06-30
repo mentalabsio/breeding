@@ -10,15 +10,15 @@ import { Transaction } from "@solana/web3.js"
 import useV2 from "../useV2"
 
 const parentsCandyMachineAddress = new web3.PublicKey(
-  "9bBjPXwFVzPSEA4BH2wFfDnzYTekQq6itf6JBNvzRW2C"
+  "HjaeGbWfBAYuYyTk9hDK79jquYMTJ6pgrjKnsBogHhQu"
 )
 
 const rewardsCandyMachineAddress = new web3.PublicKey(
-  "8VcKE18WYYJyGZBDE8xWoKPNun3jQK3awGRBYc55MLV4"
+  "FHK5bsRAFPbj7tDYeEeKpkztuz49zG33ZbpaDAxJ7Mcf"
 )
 
 const feeToken = new web3.PublicKey(
-  "Eez6QJBwD9Woe2JSUQuPnGkGrKoQtaZniMbY8Xjv2kcE"
+  "6PCYef4LDWsFooniF1h2cQtKiB5BPzMobnWDTUkanHpk"
 )
 
 const programId = new web3.PublicKey(
@@ -26,7 +26,7 @@ const programId = new web3.PublicKey(
 )
 
 const breedingMachineAuthority = new web3.PublicKey(
-  "ViVDtpVYKdhRRH9FTKsh6reJB9xXUqpX1233BSDZWRQ"
+  "3hBWdLsxogSitaU7q2xzCtWvDVcA7G63HomM2zU3Tjo3"
 )
 
 export const useBreeding = () => {

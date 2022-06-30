@@ -19,11 +19,11 @@ describe("breed-program", () => {
   )
 
   const parentsCandyMachineAddress = new anchor.web3.PublicKey(
-    "9bBjPXwFVzPSEA4BH2wFfDnzYTekQq6itf6JBNvzRW2C"
+    "HjaeGbWfBAYuYyTk9hDK79jquYMTJ6pgrjKnsBogHhQu"
   )
 
   const rewardsCandyMachineAddress = new anchor.web3.PublicKey(
-    "8VcKE18WYYJyGZBDE8xWoKPNun3jQK3awGRBYc55MLV4"
+    "FHK5bsRAFPbj7tDYeEeKpkztuz49zG33ZbpaDAxJ7Mcf"
   )
 
   const breedingMachineAuthority = anchor.web3.Keypair.fromSecretKey(
@@ -46,7 +46,7 @@ describe("breed-program", () => {
   )
 
   const feeToken = new anchor.web3.PublicKey(
-    "Eez6QJBwD9Woe2JSUQuPnGkGrKoQtaZniMbY8Xjv2kcE"
+    "6PCYef4LDWsFooniF1h2cQtKiB5BPzMobnWDTUkanHpk"
   )
 
   const breedingMachine = findBreedingMachineAddress(
@@ -73,9 +73,9 @@ describe("breed-program", () => {
       burnParents: false,
       /** breedingTime in seconds */
       breedingTime: new anchor.BN(0),
-      rewardSupply: new anchor.BN(10),
+      rewardSupply: new anchor.BN(2222),
       initializationFeeToken: feeToken,
-      initializationFeePrice: new anchor.BN(1000),
+      initializationFeePrice: new anchor.BN(100),
       rewardCandyMachine: rewardsCandyMachineAddress,
       parentsCandyMachine: parentsCandyMachineAddress,
     }
@@ -122,7 +122,7 @@ describe("breed-program", () => {
       .updateMachineConfig({
         initializationFeePrice: newPrice,
         breedingTime: new anchor.BN(0),
-        burnParents: false,
+        burnParents: true,
       })
       .accounts({
         breedingMachine,
