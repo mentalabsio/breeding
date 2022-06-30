@@ -241,8 +241,8 @@ export default function Home() {
                   fontSize: "1.4rem",
                 }}
               >
-                Your two Nifty Nanas&nbsp;<b>will</b>&nbsp;be burned to generate
-                the new Baby Nana!
+                Your two Nifty Nanas&nbsp;will&nbsp;be burned to generate the
+                new Baby Nana!
               </Alert>
 
               <Flex
