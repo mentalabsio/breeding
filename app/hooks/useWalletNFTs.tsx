@@ -46,13 +46,13 @@ const useWalletNFTs = (creators: string[]) => {
     })
 
     setWalletNFTs(filtered)
-  }, [connection, publicKey])
+  }, [connection, publicKey, creators])
 
   useEffect(() => {
     if (publicKey) {
       fetchNFTs()
     }
-  }, [publicKey])
+  }, [fetchNFTs])
 
   return { walletNFTs, fetchNFTs }
 }

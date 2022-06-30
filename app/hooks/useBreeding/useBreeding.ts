@@ -1,6 +1,6 @@
 import { Provider, utils, web3, BN, Program, Idl } from "@project-serum/anchor"
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import {
   findBreedingMachineAddress,
   findWhitelistTokenAddress,
@@ -8,10 +8,6 @@ import {
 import { createBreeding } from "@/utils/breeding"
 import { Transaction } from "@solana/web3.js"
 import useV2 from "../useV2"
-
-const parentsCandyMachineAddress = new web3.PublicKey(
-  "HjaeGbWfBAYuYyTk9hDK79jquYMTJ6pgrjKnsBogHhQu"
-)
 
 const rewardsCandyMachineAddress = new web3.PublicKey(
   "FHK5bsRAFPbj7tDYeEeKpkztuz49zG33ZbpaDAxJ7Mcf"
@@ -29,7 +25,7 @@ const breedingMachineAuthority = new web3.PublicKey(
   "3hBWdLsxogSitaU7q2xzCtWvDVcA7G63HomM2zU3Tjo3"
 )
 
-export const useBreeding = () => {
+export const useBreeding = (parentsCreator: string) => {
   const { connection } = useConnection()
   const anchorWallet = useAnchorWallet()
   const { onMint } = useV2()
@@ -39,6 +35,11 @@ export const useBreeding = () => {
   const [userBreedDatas, setUserBreedDatas] = useState(null)
   const [feedbackStatus, setFeedbackStatus] = useState("")
   const [userTokenBalance, setUserTokenBalance] = useState(null)
+
+  const parentsCandyMachineAddress = useMemo(
+    () => new web3.PublicKey(parentsCreator),
+    [parentsCreator]
+  )
 
   /**
    * Fetch IDL, breeding machine and breed datas on mount
@@ -155,13 +156,13 @@ export const useBreeding = () => {
 
     // setUserBreedDatas(breedDatasWithNFTs)
     setFeedbackStatus("")
-  }, [connection, anchorWallet])
+  }, [connection, anchorWallet, parentsCandyMachineAddress])
 
   useEffect(() => {
     if (connection && anchorWallet?.publicKey) {
       fetchData()
     }
-  }, [connection, anchorWallet])
+  }, [fetchData])
 
   const initializeBreedingMachine = async () => {
     const config = {

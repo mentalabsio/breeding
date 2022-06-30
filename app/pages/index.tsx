@@ -10,22 +10,30 @@ import { web3 } from "@project-serum/anchor"
 import { useAnchorWallet } from "@solana/wallet-adapter-react"
 import { Button, Flex, Heading, Text, Alert } from "@theme-ui/components"
 import Head from "next/head"
-import { useEffect } from "react"
+import { useEffect, useMemo, useState } from "react"
+
+const collections = [
+  "HjaeGbWfBAYuYyTk9hDK79jquYMTJ6pgrjKnsBogHhQu",
+  "DD6JPVzSz3jBiSoQTKUAdqRaQ9M6erhvQgzerU1eqKAd",
+]
 
 export default function Home() {
   const anchorWallet = useAnchorWallet()
-  const { walletNFTs, fetchNFTs } = useWalletNFTs([
-    "HjaeGbWfBAYuYyTk9hDK79jquYMTJ6pgrjKnsBogHhQu",
-  ])
+  const [currentCollectionIndex, setCurrentCollectionIdex] = useState(0)
+
+  const currentCollection = useMemo(
+    () => [collections[currentCollectionIndex || 0]],
+    [currentCollectionIndex]
+  )
+
+  const { walletNFTs, fetchNFTs } = useWalletNFTs(currentCollection)
+
   const {
     initializeAndTerminateBreeding,
-    terminateBreeding,
-    onMint,
     breedingMachineAccount,
-    userBreedDatas,
     feedbackStatus,
     userTokenBalance,
-  } = useBreeding()
+  } = useBreeding(currentCollection[0])
 
   /** Just log some info on mount */
   useEffect(() => {
@@ -187,6 +195,7 @@ export default function Home() {
                 e.preventDefault()
 
                 const data = new FormData(e.currentTarget)
+
                 const mints = data.getAll("mint").filter((val) => val)
 
                 if (!anchorWallet?.publicKey) return true
@@ -222,7 +231,6 @@ export default function Home() {
                 }}
               >
                 <NFTSelectInput name="mint" NFTs={walletNFTs} />
-
                 <PlusSign
                   sx={{
                     width: "3.2rem",
@@ -231,8 +239,23 @@ export default function Home() {
                     strokeWidth: ".2rem",
                   }}
                 />
-
                 <NFTSelectInput name="mint" NFTs={walletNFTs} />
+                <Button
+                  title="Can't see your NFT? Click here to change the collection!"
+                  sx={{
+                    padding: "0 .8rem",
+                    border: "1px solid",
+                    borderRadius: "25px",
+                  }}
+                  variant="resetted"
+                  onClick={() => {
+                    setCurrentCollectionIdex((prev) =>
+                      prev + 1 < collections.length ? prev + 1 : 0
+                    )
+                  }}
+                >
+                  !
+                </Button>{" "}
               </Flex>
 
               <Alert
