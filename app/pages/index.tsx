@@ -276,9 +276,22 @@ export default function Home() {
                 }}
               >
                 {cost && anchorWallet?.publicKey ? (
-                  <Text>
-                    {cost && "Cost: " + cost} | Your Balance:{" "}
+                  <Text
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: ".8rem",
+                    }}
+                  >
+                    {" "}
+                    {cost && "Cost: " + cost / 1000} | Your Balance:{" "}
                     {userTokenBalance || "0"}
+                    <img
+                      sx={{
+                        maxWidth: "3.2rem",
+                      }}
+                      src="/nanascoin.png"
+                    />
                   </Text>
                 ) : (
                   <>&nbsp; </>
@@ -304,6 +317,7 @@ export default function Home() {
                       {feedbackStatus !== "Success!" && <LoadingIcon />}
 
                       <Text
+                        variant="small"
                         sx={{
                           color:
                             feedbackStatus === "Success!" ? "success" : "text",
