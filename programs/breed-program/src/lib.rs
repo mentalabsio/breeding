@@ -60,9 +60,7 @@ pub mod breed_program {
         Ok(())
     }
 
-    #[access_control(
-        charge::token_fee(&ctx, ctx.accounts.breeding_machine.config.initialization_fee_price)
-    )]
+    #[access_control(InitializeBreed::charge_token_fee(&ctx, ctx.accounts.breeding_machine.config.initialization_fee_price))]
     #[access_control(InitializeBreed::validate_nfts(&ctx))]
     pub fn initialize_breeding(ctx: Context<InitializeBreed>) -> Result<()> {
         let owner = ctx.accounts.user_wallet.key();
@@ -90,9 +88,11 @@ pub mod breed_program {
         let breed_start_timestamp = ctx.accounts.breed_data.timestamp as u64;
         let breeding_time = ctx.accounts.breeding_machine.config.breeding_time;
 
-        if breed_start_timestamp + breeding_time > now_timestamp {
-            return Err(error!(BreedingError::StillInProgress));
-        }
+        require_gte!(
+            now_timestamp,
+            breed_start_timestamp + breeding_time,
+            BreedingError::StillInProgress
+        );
 
         // Unlock parents (burn or transfer back)
         let breed_data_bump = *ctx.bumps.get("breed_data").unwrap();

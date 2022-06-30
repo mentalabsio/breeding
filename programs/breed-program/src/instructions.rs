@@ -4,7 +4,7 @@ use anchor_spl::{
     associated_token::AssociatedToken,
     token::{Burn, CloseAccount, Mint, MintTo, SetAuthority, Token, TokenAccount, Transfer},
 };
-use solutils::{charge::Chargeable, wrappers::metadata::MetadataAccount};
+use solutils::wrappers::metadata::MetadataAccount;
 
 #[derive(Accounts)]
 #[instruction(config: BreedConfig)]
@@ -86,7 +86,7 @@ pub struct UpdateMachineConfig<'info> {
     pub authority: Signer<'info>,
 }
 
-#[derive(Accounts, Chargeable)]
+#[derive(Accounts)]
 pub struct InitializeBreed<'info> {
     #[account(
         mut,
@@ -158,18 +158,17 @@ pub struct InitializeBreed<'info> {
     )]
     pub vault_ata_parent_b: Box<Account<'info, TokenAccount>>,
 
+    #[account(mut, address = breeding_machine.config.initialization_fee_token)]
+    pub fee_token: Account<'info, Mint>,
+
     #[account(
         mut,
-        associated_token::mint = breeding_machine.config.initialization_fee_token,
+        associated_token::mint = fee_token,
         associated_token::authority = user_wallet
     )]
     pub fee_payer_ata: Box<Account<'info, TokenAccount>>,
 
     #[account(mut)]
-    pub fee_incinerator_ata: Box<Account<'info, TokenAccount>>,
-
-    #[account(mut)]
-    #[fee_payer]
     pub user_wallet: Signer<'info>,
     pub rent: Sysvar<'info, Rent>,
     pub token_program: Program<'info, Token>,
@@ -189,8 +188,6 @@ fn verify_creator(metadata: &MetadataAccount, creator_address: Pubkey) -> Result
 
 impl<'info> InitializeBreed<'info> {
     pub fn validate_nfts(ctx: &Context<Self>) -> Result<()> {
-        // TODO: validate parents verified creator.
-
         verify_creator(
             &*ctx.accounts.metadata_parent_a,
             ctx.accounts.breeding_machine.config.parents_candy_machine,
@@ -200,6 +197,26 @@ impl<'info> InitializeBreed<'info> {
             &*ctx.accounts.metadata_parent_b,
             ctx.accounts.breeding_machine.config.parents_candy_machine,
         )?;
+
+        Ok(())
+    }
+
+    pub fn charge_token_fee(ctx: &Context<Self>, amount: u64) -> Result<()> {
+        let fee_payer_ata = &*ctx.accounts.fee_payer_ata;
+        let fee_payer_ata_balance = fee_payer_ata.amount;
+        if fee_payer_ata_balance < amount {
+            return Err(ProgramError::InsufficientFunds.into());
+        }
+
+        let cpi_accounts = Burn {
+            from: ctx.accounts.fee_payer_ata.to_account_info(),
+            mint: ctx.accounts.fee_token.to_account_info(),
+            authority: ctx.accounts.user_wallet.to_account_info(),
+        };
+
+        let cpi_ctx = CpiContext::new(ctx.accounts.token_program.to_account_info(), cpi_accounts);
+
+        anchor_spl::token::burn(cpi_ctx, amount)?;
 
         Ok(())
     }

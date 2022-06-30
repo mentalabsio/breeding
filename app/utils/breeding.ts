@@ -157,7 +157,6 @@ export const createBreeding = (
        * Additional instructions:
        *
        * Create ATA for fee payer if necessary
-       * Create ATA for incinerator if necessary
        */
       const additionalInstructions = []
 
@@ -178,29 +177,6 @@ export const createBreeding = (
             feeToken,
             feePayerAtaAddress,
             userWallet.publicKey,
-            userWallet.publicKey
-          )
-
-        additionalInstructions.push(createAtaInstruction)
-      }
-
-      const feeIncineratorAtaAddress = await utils.token.associatedAddress({
-        mint: feeToken,
-        owner: incineratorAddress,
-      })
-
-      const feeIncineratorAtaAccountInfo = await connection.getAccountInfo(
-        feeIncineratorAtaAddress
-      )
-
-      if (!feeIncineratorAtaAccountInfo) {
-        const createAtaInstruction =
-          Token.createAssociatedTokenAccountInstruction(
-            ASSOCIATED_TOKEN_PROGRAM_ID,
-            TOKEN_PROGRAM_ID,
-            feeToken,
-            feeIncineratorAtaAddress,
-            incineratorAddress,
             userWallet.publicKey
           )
 
@@ -233,7 +209,6 @@ export const createBreeding = (
 
           feeToken,
           feePayerAta: feePayerAtaAddress,
-          feeIncineratorAta: feeIncineratorAtaAddress,
 
           userWallet: userWallet.publicKey,
         })
