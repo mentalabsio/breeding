@@ -33,6 +33,7 @@ export default function Home() {
     breedingMachineAccount,
     feedbackStatus,
     userTokenBalance,
+    onMint,
   } = useBreeding(currentCollection[0])
 
   /** Just log some info on mount */
@@ -240,7 +241,7 @@ export default function Home() {
                   }}
                 />
                 <NFTSelectInput name="mint" NFTs={walletNFTs} />
-                <Button
+                {/* <Button
                   title="Can't see your NFT? Click here to change the collection!"
                   sx={{
                     padding: "0 .8rem",
@@ -255,7 +256,7 @@ export default function Home() {
                   }}
                 >
                   !
-                </Button>{" "}
+                </Button>{" "} */}
               </Flex>
 
               <Alert
@@ -447,7 +448,7 @@ export default function Home() {
               )}
             </Flex> */}
 
-            {/* <Text
+            <Text
               variant="small"
               sx={{
                 display: "flex",
@@ -461,7 +462,7 @@ export default function Home() {
                 click here
               </Button>{" "}
               <Text variant="xsmall">to mint manually</Text>
-            </Text> */}
+            </Text>
           </Flex>
         </Flex>
       </main>
