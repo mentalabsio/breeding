@@ -15,7 +15,7 @@ import { useEffect } from "react"
 export default function Home() {
   const anchorWallet = useAnchorWallet()
   const { walletNFTs, fetchNFTs } = useWalletNFTs([
-    "9bBjPXwFVzPSEA4BH2wFfDnzYTekQq6itf6JBNvzRW2C",
+    "HjaeGbWfBAYuYyTk9hDK79jquYMTJ6pgrjKnsBogHhQu",
   ])
   const {
     initializeAndTerminateBreeding,
