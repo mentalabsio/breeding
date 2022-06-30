@@ -285,11 +285,11 @@ export const useBreeding = (parentsCreator: string) => {
 
       const { tx } = await terminate(mintParentA, mintParentB)
 
-      setFeedbackStatus("[Breed] Confirming transaction...")
+      setFeedbackStatus("Confirming transaction...")
 
       await connection.confirmTransaction(tx, "confirmed")
 
-      setFeedbackStatus("[Breed] Refetching data...")
+      setFeedbackStatus("Refetching data...")
 
       await fetchData()
 
@@ -334,7 +334,7 @@ export const useBreeding = (parentsCreator: string) => {
         anchorWallet
       )
 
-      setFeedbackStatus("[Breed] Building instructions...")
+      setFeedbackStatus("Building instructions...")
 
       const {
         instruction: initInstruction,
@@ -369,7 +369,7 @@ export const useBreeding = (parentsCreator: string) => {
 
       tx.add(ixTerminate)
 
-      setFeedbackStatus("[Breed] Awaiting approval...")
+      setFeedbackStatus("Awaiting approval...")
 
       const txid = await anchorProgram.provider.send(tx, [])
 
