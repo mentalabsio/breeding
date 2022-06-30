@@ -15,7 +15,7 @@ describe("breed-program", () => {
 
   const program = new Program(
     IDL,
-    new anchor.web3.PublicKey("9K6964dfAazdKsoeR7SBGSMa1t6Q4AMSm8KFCEtAMvvy")
+    new anchor.web3.PublicKey("9zjxuHUgiVpB8Ex7QYLgYBTqEZaLR92dKxgPmdcXktrK")
   )
 
   const parentsCandyMachineAddress = new anchor.web3.PublicKey(
@@ -70,12 +70,12 @@ describe("breed-program", () => {
 
   it("should be able to create a new breeding machine", async () => {
     const config = {
-      burnParents: false,
+      burnParents: true,
       /** breedingTime in seconds */
       breedingTime: new anchor.BN(0),
       rewardSupply: new anchor.BN(2222),
       initializationFeeToken: feeToken,
-      initializationFeePrice: new anchor.BN(100),
+      initializationFeePrice: new anchor.BN(3630),
       rewardCandyMachine: rewardsCandyMachineAddress,
       parentsCandyMachine: parentsCandyMachineAddress,
     }

@@ -2,9 +2,9 @@
 seeds = false
 
 [programs.devnet]
-breed_program = "9K6964dfAazdKsoeR7SBGSMa1t6Q4AMSm8KFCEtAMvvy"
+breed_program = "9zjxuHUgiVpB8Ex7QYLgYBTqEZaLR92dKxgPmdcXktrK"
 [programs.localnet]
-breed_program = "9K6964dfAazdKsoeR7SBGSMa1t6Q4AMSm8KFCEtAMvvy"
+breed_program = "9zjxuHUgiVpB8Ex7QYLgYBTqEZaLR92dKxgPmdcXktrK"
 
 [registry]
 url = "https://anchor.projectserum.com"
