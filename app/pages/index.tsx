@@ -448,7 +448,7 @@ export default function Home() {
               )}
             </Flex> */}
 
-            {/* <Text
+            <Text
               variant="small"
               sx={{
                 display: "flex",
@@ -457,12 +457,12 @@ export default function Home() {
                 margin: "1.6rem 0",
               }}
             >
-              <Text variant="small">stuck?</Text>
+              <Text variant="small">Mint failed?</Text>
               <Button variant="resetted" onClick={() => onMint()}>
                 click here
               </Button>{" "}
               <Text variant="xsmall">to mint manually</Text>
-            </Text> */}
+            </Text>
           </Flex>
         </Flex>
       </main>
